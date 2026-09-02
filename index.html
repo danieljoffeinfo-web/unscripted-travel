@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+<meta charset="utf-8">
+<script>document.documentElement.className='js';</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unscripted Travel — Cape Town Done Your Way</title>
+<meta name="description" content="Bespoke Cape Town travel. No fixed itineraries, no coach parties, no schedule written before you arrive. We build the days around you.">
+<meta property="og:title" content="Unscripted Travel — Cape Town Done Your Way">
+<meta property="og:description" content="Bespoke Cape Town travel. We build the days around you.">
+<meta property="og:image" content="assets/booklet-wide.jpg">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#C4A375">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23454A35'/%3E%3Crect x='7' y='15' width='18' height='1.6' fill='%23D8BC7C'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ─────────────────────────────────────────────────────────
+   Unscripted Travel
+   Type + palette derived from the client's embossed cover:
+   Jost (Futura lineage) in two tracked weights, exactly as
+   the foil lettering. Gold is FOIL ONLY — rules and hairlines,
+   never a fill, never body text.
+   ───────────────────────────────────────────────────────── */
+*,*::before,*::after{ box-sizing:border-box; }
+
+:root{
+  --ink:#2A2E26;
+  --ink-soft:#5F6557;
+  --ink-faint:#8C9082;
+  --cream:#F2EDE3;
+  --cream-2:#E9E2D4;
+  --kraft:#C4A375;
+  --kraft-top:#C5A67A;   /* exact top-edge of the mobile crop */
+  --cover:#454A35;
+  --cover-lit:#565C47;
+  --gold:#B08D4F;
+  --gold-lit:#D8BC7C;
+
+  --maxw:1240px;
+  --gut:clamp(20px,5vw,64px);
+  --section:clamp(72px,7.5vw,104px);
+
+  --track-wide:.34em;
+  --track-title:.16em;
+}
+
+html{ -webkit-text-size-adjust:100%; scroll-behavior:smooth; }
+@media (prefers-reduced-motion:reduce){ html{ scroll-behavior:auto; } }
+
+body{
+  margin:0;
+  background:var(--cream);
+  color:var(--ink);
+  font-family:'Jost',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  font-weight:400;
+  font-size:clamp(1rem,.96rem + .2vw,1.06rem);
+  line-height:1.75;
+  /* barely-there paper grain — the brand is a printed object */
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E");
+}
+
+img{ max-width:100%; display:block; }
+
+.wrap{ max-width:var(--maxw); margin-inline:auto; padding-inline:var(--gut); }
+
+/* ── Typographic system, straight off the cover ── */
+.eyebrow{
+  font-weight:500; font-size:.68rem; letter-spacing:var(--track-wide);
+  text-transform:uppercase; color:var(--ink-soft); margin:0;
+}
+.title{
+  font-weight:300; text-transform:uppercase;
+  font-size:clamp(1.6rem,1.1rem + 2.1vw,2.7rem);
+  letter-spacing:var(--track-title); line-height:1.25;
+  margin:.7rem 0 0; text-wrap:balance;
+}
+/* the gold rule under the title — the cover's own lockup */
+.rule{
+  width:clamp(60px,9vw,132px); height:1px; border:0; margin:1.4rem 0 0;
+  background:var(--gold); opacity:.85;
+}
+.rule.center{ margin-inline:auto; }
+.lede{
+  max-width:56ch; margin:1.6rem 0 0; color:var(--ink-soft);
+  font-size:clamp(1.02rem,.98rem + .3vw,1.16rem);
+  text-wrap:pretty;
+}
+.section{ padding-block:var(--section); }
+.head--center{ text-align:center; }
+.head--center .lede{ margin-inline:auto; }
+
+/* ── Nav — Kobu: small caps, wide tracking, hairline on hover, no fills ── */
+.nav{
+  position:absolute; inset:0 0 auto; z-index:10;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:24px; padding:clamp(18px,2.4vw,30px) var(--gut);
+  max-width:var(--maxw); margin-inline:auto;
+}
+.nav__mark{
+  font-weight:500; font-size:.7rem; letter-spacing:var(--track-wide);
+  text-transform:uppercase; color:var(--ink); text-decoration:none;
+}
+.nav__links{ display:flex; gap:clamp(18px,2.6vw,38px); list-style:none; margin:0; padding:0; }
+.nav__links a{
+  font-weight:500; font-size:.66rem; letter-spacing:var(--track-wide);
+  text-transform:uppercase; color:var(--ink); text-decoration:none;
+  padding-bottom:4px; border-bottom:1px solid transparent;
+  transition:border-color .25s ease;
+}
+.nav__links a:hover,.nav__links a:focus-visible{ border-bottom-color:var(--ink); }
+@media (max-width:720px){ .nav__links{ display:none; } }
+
+/* ── Hero — the photograph is the masthead; no type over it ── */
+.hero{ position:relative; background:var(--kraft); }
+@media (max-width:700px){ .hero{ background:var(--kraft-top); } }
+.hero img{ width:100%; height:auto; }
+/* the desk lifts into the page */
+.hero::after{
+  content:''; position:absolute; inset:auto 0 -1px; height:clamp(40px,7vw,90px);
+  background:linear-gradient(to bottom,transparent,var(--cream));
+  pointer-events:none;
+}
+.visually-hidden{
+  position:absolute; width:1px; height:1px; overflow:hidden;
+  clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap;
+}
+
+/* ── Manifesto ── */
+.manifesto{ padding-top:clamp(64px,8vw,104px); padding-bottom:clamp(24px,3vw,44px); }
+.manifesto p.statement{
+  font-weight:300; text-transform:uppercase;
+  font-size:clamp(1.5rem,1rem + 2.6vw,2.9rem);
+  letter-spacing:var(--track-title); line-height:1.3;
+  margin:0; max-width:20ch; text-wrap:balance;
+}
+.manifesto__grid{ display:grid; gap:clamp(28px,4vw,64px); grid-template-columns:1fr; }
+@media (min-width:900px){ .manifesto__grid{ grid-template-columns:1.05fr 1fr; align-items:start; } }
+.manifesto__body p{ margin:0 0 1.1rem; color:var(--ink-soft); max-width:52ch; }
+.manifesto__body p:last-child{ margin-bottom:0; }
+
+/* ── Plates: image slots. MANNA — open blocks, 0 radius, caption tight beneath ── */
+figure{ margin:0; }
+.plate{
+  position:relative; width:100%; background:var(--cream-2);
+  border:1px solid rgba(176,141,79,.32);
+  display:grid; place-items:center; overflow:hidden;
+}
+.plate img{ width:100%; height:100%; object-fit:cover; }
+.plate__fpo{
+  font-weight:500; font-size:.58rem; letter-spacing:.3em; text-transform:uppercase;
+  color:var(--ink-faint); text-align:center; padding:12px 18px; line-height:1.9;
+}
+.plate__fpo::before{
+  content:''; display:block; width:26px; height:1px; background:var(--gold);
+  opacity:.5; margin:0 auto .9rem;
+}
+figcaption{ margin-top:10px; /* MANNA */ }
+figcaption .name{ display:block; }
+figcaption .note{ display:block; margin-top:3px; }
+/* only the wide lead plate has room for a single-line caption */
+@media (min-width:680px){
+  .plates > figure:first-child figcaption{
+    display:flex; justify-content:space-between; align-items:baseline; gap:24px;
+  }
+  .plates > figure:first-child figcaption .note{ margin-top:0; }
+}
+figcaption .name{
+  font-weight:500; font-size:.68rem; letter-spacing:.2em; text-transform:uppercase;
+}
+figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
+
+/* ── Experiences ── */
+.plates{ display:grid; gap:clamp(28px,3.4vw,48px); grid-template-columns:1fr; margin-top:clamp(40px,5vw,72px); }
+@media (min-width:680px){ .plates{ grid-template-columns:repeat(2,1fr); } }
+@media (min-width:1000px){ .plates{ grid-template-columns:repeat(3,1fr); } }
+.plates .plate{ aspect-ratio:4/5; }
+/* first plate takes the full run for editorial rhythm */
+@media (min-width:680px){
+  .plates > figure:first-child{ grid-column:1/-1; }
+  .plates > figure:first-child .plate{ aspect-ratio:16/9; }
+}
+
+/* ── How it works ── */
+.steps{ display:grid; gap:clamp(32px,4vw,56px); grid-template-columns:1fr; margin-top:clamp(40px,5vw,72px); counter-reset:s; }
+@media (min-width:760px){ .steps{ grid-template-columns:repeat(3,1fr); } }
+.step{ border-top:1px solid rgba(176,141,79,.4); padding-top:22px; counter-increment:s; }
+.step::before{
+  content:counter(s,decimal-leading-zero);
+  display:block; font-weight:500; font-size:.68rem; letter-spacing:.28em;
+  color:var(--gold); margin-bottom:1rem;
+}
+.step h3{
+  margin:0 0 .7rem; font-weight:500; font-size:.82rem;
+  letter-spacing:.22em; text-transform:uppercase;
+}
+.step p{ margin:0; color:var(--ink-soft); font-size:.97rem; }
+
+/* ── Journeys ── */
+.journeys{ background:var(--cream-2); }
+.journey-list{ margin-top:clamp(36px,4.5vw,64px); border-top:1px solid rgba(42,46,38,.14); }
+.journey{
+  display:grid; gap:8px 40px; align-items:baseline;
+  grid-template-columns:1fr; padding:clamp(26px,3.4vw,40px) 0;
+  border-bottom:1px solid rgba(42,46,38,.14);
+}
+@media (min-width:820px){ .journey{ grid-template-columns:190px 1fr auto; } }
+.journey__len{
+  font-weight:500; font-size:.68rem; letter-spacing:.26em; text-transform:uppercase;
+  color:var(--gold); white-space:nowrap;
+}
+.journey__name{
+  font-weight:300; text-transform:uppercase; letter-spacing:var(--track-title);
+  font-size:clamp(1.15rem,1rem + .8vw,1.6rem); margin:0;
+}
+.journey__desc{ margin:.5rem 0 0; color:var(--ink-soft); max-width:46ch; font-size:.97rem; }
+@media (min-width:820px){ .journey__desc{ margin-top:.35rem; } .journey__cta{ margin-top:0; } }
+.journey__cta{
+  margin-top:14px;
+  font-weight:500; font-size:.66rem; letter-spacing:.26em; text-transform:uppercase;
+  color:var(--ink); text-decoration:none; border-bottom:1px solid transparent;
+  padding-bottom:3px; transition:border-color .25s ease; white-space:nowrap;
+}
+.journey__cta:hover,.journey__cta:focus-visible{ border-bottom-color:var(--ink); }
+
+/* ── Words (client supplies the real quote) ── */
+.words{ text-align:center; }
+.words blockquote{
+  margin:clamp(30px,4vw,52px) auto 0; max-width:30ch;
+  font-weight:300; font-size:clamp(1.25rem,1rem + 1.5vw,2rem);
+  line-height:1.5; text-wrap:balance;
+}
+.words cite{
+  display:block; margin-top:1.8rem; font-style:normal;
+  font-weight:500; font-size:.66rem; letter-spacing:.28em;
+  text-transform:uppercase; color:var(--ink-faint);
+}
+
+/* ── Enquiry ── */
+.enquire{ background:var(--cover); color:var(--cream); }
+.enquire .eyebrow{ color:var(--gold-lit); }
+.enquire .lede{ color:rgba(242,237,227,.72); }
+.enquire .rule{ background:var(--gold-lit); }
+.form{ margin-top:clamp(38px,4.6vw,64px); max-width:720px; }
+.field{ margin-bottom:clamp(22px,2.6vw,32px); }
+.field label{
+  display:block; font-weight:500; font-size:.62rem; letter-spacing:.28em;
+  text-transform:uppercase; color:rgba(242,237,227,.6); margin-bottom:10px;
+}
+.field input,.field select,.field textarea{
+  width:100%; background:transparent; color:var(--cream);
+  border:0; border-bottom:1px solid rgba(242,237,227,.28); border-radius:0;
+  padding:10px 0; font:inherit; font-size:1rem;
+  transition:border-color .25s ease;
+}
+.field textarea{ resize:vertical; min-height:96px; }
+.field select{ appearance:none; cursor:pointer; }
+.field select option{ background:var(--cover); color:var(--cream); }
+.field input:focus,.field select:focus,.field textarea:focus{
+  outline:none; border-bottom-color:var(--gold-lit);
+}
+.field input::placeholder,.field textarea::placeholder{ color:rgba(242,237,227,.34); }
+.field-row{ display:grid; gap:clamp(22px,2.6vw,32px) 40px; grid-template-columns:1fr; }
+@media (min-width:640px){ .field-row{ grid-template-columns:1fr 1fr; } }
+.field-row .field{ margin-bottom:0; }
+.field-row + .field,
+.field-row + .field-row{ margin-top:clamp(22px,2.6vw,32px); }
+
+/* ghost button — Palmer: transparent, hairline, 0 radius */
+.btn{
+  display:inline-block; background:transparent; color:var(--cream);
+  border:1px solid rgba(242,237,227,.5); border-radius:0;
+  padding:15px 40px; font:inherit; font-weight:500; font-size:.68rem;
+  letter-spacing:.28em; text-transform:uppercase; cursor:pointer;
+  transition:background-color .25s ease,color .25s ease,border-color .25s ease;
+}
+.btn:hover,.btn:focus-visible{ background:var(--cream); color:var(--cover); border-color:var(--cream); }
+.btn[disabled]{ opacity:.45; cursor:default; }
+.form__note{ margin:20px 0 0; font-size:.8rem; color:rgba(242,237,227,.5); }
+.form__status{ margin:20px 0 0; font-size:.9rem; min-height:1.4em; color:var(--gold-lit); }
+
+/* ── Footer — the book closes ── */
+.footer{ background:var(--cover-lit); color:var(--cream); padding-block:clamp(48px,6vw,72px); }
+.footer__top{
+  display:grid; gap:clamp(28px,4vw,48px); grid-template-columns:1fr;
+  padding-bottom:clamp(30px,4vw,44px); border-bottom:1px solid rgba(216,188,124,.3);
+}
+@media (min-width:760px){ .footer__top{ grid-template-columns:1.4fr 1fr 1fr; } }
+.footer__mark{
+  font-weight:300; font-size:clamp(1rem,.9rem + .6vw,1.3rem);
+  letter-spacing:var(--track-title); text-transform:uppercase; margin:0;
+}
+.footer__tag{
+  margin:.9rem 0 0; font-weight:500; font-size:.62rem;
+  letter-spacing:.28em; text-transform:uppercase; color:var(--gold-lit);
+}
+.footer h4{
+  margin:0 0 1rem; font-weight:500; font-size:.62rem;
+  letter-spacing:.28em; text-transform:uppercase; color:rgba(242,237,227,.55);
+}
+.footer ul{ list-style:none; margin:0; padding:0; }
+.footer li{ margin-bottom:.6rem; }
+.footer a{
+  color:var(--cream); text-decoration:none; font-size:.95rem;
+  border-bottom:1px solid transparent; transition:border-color .25s ease;
+}
+.footer a:hover,.footer a:focus-visible{ border-bottom-color:var(--gold-lit); }
+.footer__base{
+  display:flex; flex-wrap:wrap; gap:12px 28px; justify-content:space-between;
+  padding-top:clamp(24px,3vw,32px);
+  font-size:.72rem; letter-spacing:.12em; text-transform:uppercase;
+  color:rgba(242,237,227,.5);
+}
+
+:where(a,button,input,select,textarea):focus-visible{
+  outline:2px solid var(--gold); outline-offset:3px;
+}
+
+/* ── Reveal: opacity + transform only (compositor-only, cannot jank).
+      Scoped to .js so the page still renders if JavaScript never runs. ── */
+.js .reveal{ opacity:0; transform:translate3d(0,16px,0); }
+.js .reveal.is-in{ opacity:1; transform:none; transition:opacity .7s ease,transform .7s ease; }
+@media (prefers-reduced-motion:reduce){
+  .js .reveal,.js .reveal.is-in{ opacity:1; transform:none; transition:none; }
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <a class="nav__mark" href="#top">Unscripted Travel</a>
+  <nav aria-label="Primary">
+    <ul class="nav__links">
+      <li><a href="#experiences">Experiences</a></li>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#journeys">Journeys</a></li>
+      <li><a href="#enquire">Enquire</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main id="top">
+
+  <!-- Hero: the photograph carries the wordmark. No type layered over it. -->
+  <section class="hero">
+    <h1 class="visually-hidden">Unscripted Travel — Cape Town done your way</h1>
+    <picture>
+      <source media="(max-width:700px)" srcset="assets/booklet-tight.jpg">
+      <img src="assets/booklet-wide.jpg" width="2600" height="1122"
+           alt="Unscripted Travel — an embossed dark green hardcover booklet with gold foil lettering, lying on kraft paper."
+           fetchpriority="high" decoding="async">
+    </picture>
+  </section>
+
+  <!-- Manifesto -->
+  <section class="section manifesto">
+    <div class="wrap manifesto__grid">
+      <div>
+        <p class="statement">No fixed itineraries</p>
+        <hr class="rule">
+      </div>
+      <div class="manifesto__body reveal">
+        <p>Most Cape Town trips are written before you land. A coach at eight, the same four stops, back to the hotel by five. You see the place the way ten thousand people saw it that week.</p>
+        <p>We work the other way round. You tell us what you actually like — long lunches or early starts, mountains or markets, one neighbourhood or the whole peninsula — and we build the days around it.</p>
+        <p>Nothing is locked. If the wind turns and the mountain closes, we already have the better version of that afternoon. That is the whole job.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Experiences -->
+  <section class="section" id="experiences">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="eyebrow">What the days are made of</p>
+        <h2 class="title">Experiences</h2>
+        <hr class="rule">
+        <p class="lede">A shortlist, not a menu. Every trip is assembled from scratch — these are simply the things Cape Town does better than anywhere else.</p>
+      </div>
+
+      <div class="plates">
+        <figure class="reveal">
+          <div class="plate"><p class="plate__fpo">Table Mountain<br>16:9 · landscape</p></div>
+          <figcaption><span class="name">Table Mountain</span><span class="note">Up the back path, before the cable car opens.</span></figcaption>
+        </figure>
+        <figure class="reveal">
+          <div class="plate"><p class="plate__fpo">The Winelands<br>4:5 · portrait</p></div>
+          <figcaption><span class="name">The Winelands</span><span class="note">Franschhoek, Stellenbosch.</span></figcaption>
+        </figure>
+        <figure class="reveal">
+          <div class="plate"><p class="plate__fpo">Cape Peninsula<br>4:5 · portrait</p></div>
+          <figcaption><span class="name">The Peninsula</span><span class="note">Chapman's Peak to Cape Point.</span></figcaption>
+        </figure>
+        <figure class="reveal">
+          <div class="plate"><p class="plate__fpo">Bo-Kaap<br>4:5 · portrait</p></div>
+          <figcaption><span class="name">Bo-Kaap</span><span class="note">On foot, with someone who lives there.</span></figcaption>
+        </figure>
+        <figure class="reveal">
+          <div class="plate"><p class="plate__fpo">Simon's Town<br>4:5 · portrait</p></div>
+          <figcaption><span class="name">Simon's Town</span><span class="note">Boulders, and the road that gets you there.</span></figcaption>
+        </figure>
+        <figure class="reveal">
+          <div class="plate"><p class="plate__fpo">Kirstenbosch<br>4:5 · portrait</p></div>
+          <figcaption><span class="name">Kirstenbosch</span><span class="note">Late afternoon, under the eastern slope.</span></figcaption>
+        </figure>
+        <figure class="reveal">
+          <div class="plate"><p class="plate__fpo">Atlantic Seaboard<br>4:5 · portrait</p></div>
+          <figcaption><span class="name">The Seaboard</span><span class="note">Clifton and Camps Bay, timed for the light.</span></figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="section" id="how">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="eyebrow">The process</p>
+        <h2 class="title">How it works</h2>
+        <hr class="rule">
+      </div>
+      <div class="steps">
+        <div class="step reveal">
+          <h3>Tell us what you like</h3>
+          <p>A short conversation. Not a form full of dropdowns — what you enjoy, what you would rather skip, who is coming and how long you have.</p>
+        </div>
+        <div class="step reveal">
+          <h3>We draft the days</h3>
+          <p>You get a written plan with the reasoning behind it, including the alternatives we would swap in for weather, wind or a change of mind.</p>
+        </div>
+        <div class="step reveal">
+          <h3>You travel unscripted</h3>
+          <p>Drivers, guides and tables are booked. Someone local is reachable the whole time. The plan bends when you want it to.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Journeys -->
+  <section class="section journeys" id="journeys">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="eyebrow">Starting points</p>
+        <h2 class="title">Journeys</h2>
+        <hr class="rule">
+        <p class="lede">Three shapes people tend to start from. Each one gets rebuilt around you — treat them as a sense of pace, not a package.</p>
+      </div>
+      <div class="journey-list">
+        <article class="journey reveal">
+          <p class="journey__len">Four days</p>
+          <div>
+            <h3 class="journey__name">The city and the coast</h3>
+            <p class="journey__desc">Enough for the mountain, the peninsula drive and two long dinners. The version for a first visit that refuses to be rushed.</p>
+          </div>
+          <a class="journey__cta" href="#enquire">Enquire</a>
+        </article>
+        <article class="journey reveal">
+          <p class="journey__len">Seven days</p>
+          <div>
+            <h3 class="journey__name">Wider, and slower</h3>
+            <p class="journey__desc">The city, two nights in the winelands, and room in the middle for whatever you decide you want more of.</p>
+          </div>
+          <a class="journey__cta" href="#enquire">Enquire</a>
+        </article>
+        <article class="journey reveal">
+          <p class="journey__len">Ten days or more</p>
+          <div>
+            <h3 class="journey__name">The whole thing</h3>
+            <p class="journey__desc">Cape Town as the base, then east along the coast — whales in season, the Garden Route, or a few nights on a reserve.</p>
+          </div>
+          <a class="journey__cta" href="#enquire">Enquire</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Words — REPLACE with a real client quote before launch -->
+  <section class="section words">
+    <div class="wrap reveal">
+      <p class="eyebrow">In their words</p>
+      <hr class="rule center">
+      <blockquote>&ldquo;Client testimonial goes here — a real quote, two or three lines.&rdquo;</blockquote>
+      <cite>Name, City — placeholder</cite>
+    </div>
+  </section>
+
+  <!-- Enquiry -->
+  <section class="section enquire" id="enquire">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="eyebrow">Start here</p>
+        <h2 class="title">Tell us what you like</h2>
+        <hr class="rule">
+        <p class="lede">No deposit, no obligation. We reply within one working day with a first idea of the shape your trip could take.</p>
+      </div>
+
+      <form class="form reveal" id="enquiry" novalidate>
+        <div class="field-row">
+          <div class="field">
+            <label for="name">Your name</label>
+            <input id="name" name="name" type="text" autocomplete="name" required>
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" required>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="dates">Rough dates</label>
+            <input id="dates" name="dates" type="text" placeholder="March 2027, or still deciding">
+          </div>
+          <div class="field">
+            <label for="party">Who is coming</label>
+            <select id="party" name="party">
+              <option>Two of us</option>
+              <option>A family</option>
+              <option>A group of friends</option>
+              <option>Travelling solo</option>
+              <option>A company trip</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="about">What would make this trip worth it</label>
+          <textarea id="about" name="about" rows="4" placeholder="Food, hiking, wine, art, quiet, the ocean — whatever it actually is."></textarea>
+        </div>
+
+        <button class="btn" type="submit">Send enquiry</button>
+        <p class="form__status" id="status" role="status" aria-live="polite"></p>
+        <p class="form__note">We use this only to answer you. Nothing is shared with anyone else.</p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__top">
+      <div>
+        <p class="footer__mark">Unscripted Travel</p>
+        <p class="footer__tag">Cape Town done your way</p>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="mailto:hello@unscriptedtravel.co.za">hello@unscriptedtravel.co.za</a></li>
+          <li><a href="tel:+27000000000">+27 00 000 0000</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Elsewhere</h4>
+        <ul>
+          <li><a href="#" rel="noopener">Instagram</a></li>
+          <li><a href="#" rel="noopener">WhatsApp</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__base">
+      <span>&copy; <span id="yr"></span> Unscripted Travel</span>
+      <span>Cape Town, South Africa</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ── Set this to your form endpoint (Formspree, Supabase fn, etc.).
+      Left empty, the form falls back to opening a pre-filled email. ── */
+const FORM_ENDPOINT = '';
+const CONTACT_EMAIL = 'hello@unscriptedtravel.co.za';
+
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+/* Reveal on scroll — opacity + transform only, so it stays on the compositor */
+const io = new IntersectionObserver((entries) => {
+  for (const e of entries) {
+    if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+  }
+}, { rootMargin: '0px 0px -8% 0px', threshold: .08 });
+document.querySelectorAll('.reveal').forEach((el, i) => {
+  el.style.transitionDelay = (i % 3) * 70 + 'ms';
+  io.observe(el);
+});
+
+/* Enquiry form */
+const form = document.getElementById('enquiry');
+const status = document.getElementById('status');
+
+form.addEventListener('submit', async (ev) => {
+  ev.preventDefault();
+  const data = Object.fromEntries(new FormData(form).entries());
+
+  if (!data.name.trim() || !data.email.trim()) {
+    status.textContent = 'Please add your name and email.';
+    (!data.name.trim() ? form.name : form.email).focus();
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+    status.textContent = 'That email address does not look right.';
+    form.email.focus();
+    return;
+  }
+
+  const btn = form.querySelector('button[type=submit]');
+  btn.disabled = true;
+  status.textContent = 'Sending…';
+
+  if (!FORM_ENDPOINT) {
+    const body = `Name: ${data.name}\nEmail: ${data.email}\nDates: ${data.dates || '—'}\n` +
+                 `Who: ${data.party}\n\n${data.about || ''}`;
+    window.location.href = `mailto:${CONTACT_EMAIL}` +
+      `?subject=${encodeURIComponent('Trip enquiry — ' + data.name)}` +
+      `&body=${encodeURIComponent(body)}`;
+    status.textContent = 'Opening your email app…';
+    btn.disabled = false;
+    return;
+  }
+
+  try {
+    const res = await fetch(FORM_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify(data)
+    });
+    if (!res.ok) throw new Error(res.status);
+    form.innerHTML = '<p class="lede" style="margin:0">Thank you — that has come through. ' +
+                     'We will be back to you within one working day.</p>';
+  } catch (err) {
+    status.textContent = 'Something went wrong. Please email ' + CONTACT_EMAIL + '.';
+    btn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>
