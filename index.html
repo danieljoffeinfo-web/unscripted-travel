@@ -116,24 +116,39 @@ img{ max-width:100%; display:block; }
 @media (max-width:720px){ .nav__links{ display:none; } }
 
 /* ── Hero — the photograph is the masthead; no type over it ── */
-.hero{ position:relative; background:var(--kraft); }
+.hero{
+  position:relative; background:var(--kraft);
+  /* vertical panning still scrolls the page; horizontal is ours, so a touch
+     drag scrubs the wipe instead of being cancelled by the scroller */
+  touch-action:pan-y;
+}
 
-/* Alternate cover, revealed on hover.
+/* Alternate cover, wiped in under the cursor.
    Only the printed cover differs between the two states — the kraft, spine and
    shadow all belong to the base crop — so this is just the book, positioned by
    percentages derived from the same geometry the crops are built with
    (tools/build-hero.py prints them). One to one at every viewport width.
-   Opacity only: compositor-driven, so the crossfade cannot jank. */
+
+   --wipe is the soft mask edge, driven directly by pointer X, so the boundary
+   sits under the cursor rather than toggling a fixed state. Registering it with
+   @property makes it a real animatable value, so the ease in on enter and the
+   release on leave interpolate instead of snapping. */
+@property --wipe{ syntax:'<percentage>'; initial-value:-8%; inherits:false; }
+
 img.hero__cover{
   position:absolute; pointer-events:none;
   left:30.0769%; top:10.8071%; width:39.4231%; height:54.7196%;
-  opacity:0; transition:opacity 900ms cubic-bezier(.33,0,.2,1);
+  --wipe:-8%;
+  -webkit-mask-image:linear-gradient(to right,
+     #000 calc(var(--wipe) - 8%), transparent calc(var(--wipe) + 8%));
+          mask-image:linear-gradient(to right,
+     #000 calc(var(--wipe) - 8%), transparent calc(var(--wipe) + 8%));
+  will-change:--wipe;
 }
 @media (max-width:700px){
   img.hero__cover{ left:7.2560%; top:23.4097%; width:85.4879%; height:50.8906%; }
 }
-@media (hover:hover){ .hero:hover img.hero__cover{ opacity:1; } }
-.hero.is-alt img.hero__cover{ opacity:1; }   /* tap, on touch devices */
+@media (prefers-reduced-motion:reduce){ img.hero__cover{ will-change:auto; } }
 @media (max-width:700px){ .hero{ background:var(--kraft-top); } }
 .hero > picture img{ width:100%; height:auto; display:block; }
 /* the desk lifts into the page */
@@ -626,11 +641,57 @@ document.querySelectorAll('.reveal').forEach((el, i) => {
   io.observe(el);
 });
 
-/* Touch devices have no hover — let a tap reveal the alternate cover */
-if (!window.matchMedia('(hover: hover)').matches) {
-  const hero = document.querySelector('.hero');
-  hero.addEventListener('pointerdown', () => hero.classList.toggle('is-alt'));
-}
+/* ── Hero: the alternate cover is wiped in under the pointer ──
+   The mask edge tracks pointer X across the book, so the reveal is scrubbed
+   rather than switched. Entering eases from rest to wherever the cursor is;
+   after that it follows directly; leaving eases back.
+   The rect is cached and writes are batched into one rAF, so a pointermove
+   burst can never cause more than one style write per frame. */
+(function () {
+  const hero  = document.querySelector('.hero');
+  const cover = document.querySelector('.hero__cover');
+  if (!hero || !cover) return;
+
+  const REST = -8, FULL = 108;          // mask stops: fully hidden -> fully shown
+  const EASE = 520;
+  let rect = null, raf = 0, target = REST, easing = false, timer = 0;
+
+  const measure = () => { rect = cover.getBoundingClientRect(); };
+  const write   = v => cover.style.setProperty('--wipe', v.toFixed(2) + '%');
+  const ease    = on => { cover.style.transition = on ? `--wipe ${EASE}ms cubic-bezier(.33,0,.2,1)` : 'none'; };
+
+  function progress(e) {
+    if (!rect) measure();
+    const p = (e.clientX - rect.left) / rect.width;
+    return REST + Math.min(1, Math.max(0, p)) * (FULL - REST);
+  }
+
+  /* Ease to a value, then hand control back to direct tracking. Both the flag
+     and the transition have to be cleared here — leaving the transition on is
+     what makes the wipe lag behind the cursor afterwards. */
+  function settleTo(v) {
+    clearTimeout(timer);
+    easing = true; ease(true); write(v);
+    timer = setTimeout(() => { easing = false; ease(false); }, EASE + 20);
+  }
+
+  const engage  = e => { measure(); settleTo(progress(e)); };
+  const release = () => settleTo(REST);
+
+  hero.addEventListener('pointerenter', engage);
+  hero.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') engage(e); });
+  hero.addEventListener('pointermove', e => {
+    target = progress(e);
+    if (easing) return;
+    if (!raf) raf = requestAnimationFrame(() => { raf = 0; write(target); });
+  }, { passive: true });
+  hero.addEventListener('pointerleave',  release);
+  hero.addEventListener('pointercancel', release);
+  hero.addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') release(); });
+
+  addEventListener('resize', measure, { passive: true });
+  addEventListener('scroll', () => { rect = null; }, { passive: true });
+})();
 
 /* Enquiry form */
 const form = document.getElementById('enquiry');
