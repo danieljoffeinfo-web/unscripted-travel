@@ -35,6 +35,8 @@
   --kraft-top:#C5A67A;   /* exact top-edge of the mobile crop */
   --cover:#454A35;
   --cover-lit:#565C47;
+  --sage:#55654B;       /* display titles on light grounds — 5.37:1 on cream */
+  --sage-lit:#C3D1B4;   /* display titles on the dark panel  — 5.74:1 on cover */
   --gold:#B08D4F;
   --gold-lit:#D8BC7C;
 
@@ -75,6 +77,7 @@ img{ max-width:100%; display:block; }
   font-size:clamp(1.6rem,1.1rem + 2.1vw,2.7rem);
   letter-spacing:var(--track-title); line-height:1.25;
   margin:.7rem 0 0; text-wrap:balance;
+  color:var(--sage);
 }
 /* the gold rule under the title — the cover's own lockup */
 .rule{
@@ -117,9 +120,26 @@ img{ max-width:100%; display:block; }
 @media (max-width:700px){ .hero{ background:var(--kraft-top); } }
 .hero img{ width:100%; height:auto; }
 /* the desk lifts into the page */
+/* The desk lifts into the page. Multi-stop and eased: a two-stop linear
+   gradient starts too abruptly and reads as a visible band. The photograph
+   carries deep kraft below the book so this never washes over it. */
 .hero::after{
-  content:''; position:absolute; inset:auto 0 -1px; height:clamp(40px,7vw,90px);
-  background:linear-gradient(to bottom,transparent,var(--cream));
+  content:''; position:absolute; inset:auto 0 -1px;
+  height:clamp(160px,22vw,300px);
+  background:linear-gradient(to bottom,
+    rgba(242,237,227,0)    0%,
+    rgba(242,237,227,.008) 10%,
+    rgba(242,237,227,.03)  20%,
+    rgba(242,237,227,.07)  30%,
+    rgba(242,237,227,.13)  40%,
+    rgba(242,237,227,.21)  50%,
+    rgba(242,237,227,.32)  60%,
+    rgba(242,237,227,.46)  70%,
+    rgba(242,237,227,.60)  78%,
+    rgba(242,237,227,.74)  85%,
+    rgba(242,237,227,.86)  91%,
+    rgba(242,237,227,.95)  96%,
+    rgba(242,237,227,1)   100%);
   pointer-events:none;
 }
 .visually-hidden{
@@ -134,6 +154,7 @@ img{ max-width:100%; display:block; }
   font-size:clamp(1.5rem,1rem + 2.6vw,2.9rem);
   letter-spacing:var(--track-title); line-height:1.3;
   margin:0; max-width:20ch; text-wrap:balance;
+  color:var(--sage);
 }
 .manifesto__grid{ display:grid; gap:clamp(28px,4vw,64px); grid-template-columns:1fr; }
 @media (min-width:900px){ .manifesto__grid{ grid-template-columns:1.05fr 1fr; align-items:start; } }
@@ -213,6 +234,7 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
 .journey__name{
   font-weight:300; text-transform:uppercase; letter-spacing:var(--track-title);
   font-size:clamp(1.15rem,1rem + .8vw,1.6rem); margin:0;
+  color:var(--sage);
 }
 .journey__desc{ margin:.5rem 0 0; color:var(--ink-soft); max-width:46ch; font-size:.97rem; }
 @media (min-width:820px){ .journey__desc{ margin-top:.35rem; } .journey__cta{ margin-top:0; } }
@@ -240,6 +262,7 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
 /* ── Enquiry ── */
 .enquire{ background:var(--cover); color:var(--cream); }
 .enquire .eyebrow{ color:var(--gold-lit); }
+.enquire .title{ color:var(--sage-lit); }
 .enquire .lede{ color:rgba(242,237,227,.72); }
 .enquire .rule{ background:var(--gold-lit); }
 .form{ margin-top:clamp(38px,4.6vw,64px); max-width:720px; }
@@ -347,7 +370,7 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
     <h1 class="visually-hidden">Unscripted Travel — Cape Town done your way</h1>
     <picture>
       <source media="(max-width:700px)" srcset="assets/booklet-tight.jpg">
-      <img src="assets/booklet-wide.jpg" width="2600" height="1122"
+      <img src="assets/booklet-wide.jpg" width="2600" height="1462"
            alt="Unscripted Travel — an embossed dark green hardcover booklet with gold foil lettering, lying on kraft paper."
            fetchpriority="high" decoding="async">
     </picture>
