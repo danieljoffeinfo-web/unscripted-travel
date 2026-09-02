@@ -18,7 +18,10 @@ import sys, statistics
 from PIL import Image
 
 SRC   = sys.argv[1] if len(sys.argv) > 1 else '/Users/danieljoffe/Desktop/Unscripted Travel .png'
+ALT   = '/Users/danieljoffe/Pictures/Photos Library.photoslibrary/originals/8/8F86429D-7591-4B82-9EDA-8413C4067FF6.jpeg'
 BOOK  = (183, 158, 1208, 958)      # book bounding box in the source
+ALT_BOOK = (533, 200, 1211, 732)   # same book, same mockup, in the alternate shot
+ALT_GAIN = 1.1016                  # exposure delta between the two shots (WB matches)
 WIDE_W, BOTTOM_EXT, TOP_EXT = 2600, 340, 210
 
 src = Image.open(SRC).convert('RGB')
@@ -131,5 +134,40 @@ for y in range(TOP_EXT):
 tight = grow_bottom(head, 240)
 tight.save('assets/booklet-tight.jpg', quality=88, optimize=True, progressive=True)
 
+
+# ── alternate cover ────────────────────────────────────────────────────────
+# The alternate shot is the same mockup photographed at a different distance.
+# Scale it so its book lands exactly on BOOK, match exposure, and export only
+# the book: the kraft, spine shadow and framing all stay with the base crops,
+# so the two states differ by nothing except the printed cover.
+alt = Image.open(ALT).convert('RGB')
+sx  = (BOOK[2] - BOOK[0]) / (ALT_BOOK[2] - ALT_BOOK[0])
+sy  = (BOOK[3] - BOOK[1]) / (ALT_BOOK[3] - ALT_BOOK[1])
+res = alt.resize((round(alt.size[0] * sx), round(alt.size[1] * sy)), Image.LANCZOS)
+ox, oy = round(ALT_BOOK[0] * sx) - BOOK[0], round(ALT_BOOK[1] * sy) - BOOK[1]
+cover = res.crop((ox + BOOK[0], oy + BOOK[1], ox + BOOK[2], oy + BOOK[3]))
+px = cover.load()
+for y in range(cover.size[1]):
+    for x in range(cover.size[0]):
+        r, g, b = px[x, y]
+        px[x, y] = (min(255, int(r * ALT_GAIN)),
+                    min(255, int(g * ALT_GAIN)),
+                    min(255, int(b * ALT_GAIN)))
+cover.save('assets/cover-penguin.jpg', quality=88, optimize=True, progressive=True)
+
+bw, bh = BOOK[2] - BOOK[0], BOOK[3] - BOOK[1]
+pad_x  = (WIDE_W - W) // 2
+mx     = int(bw * 0.085)
+tw     = min(W, BOOK[2] + mx) - max(0, BOOK[0] - mx)
+
 print('booklet-wide.jpg ', wide.size)
 print('booklet-tight.jpg', tight.size)
+print('cover-penguin.jpg', cover.size)
+print()
+print('CSS geometry for the overlay (percentages of each crop):')
+print('  desktop  left %.4f%%  top %.4f%%  width %.4f%%  height %.4f%%' % (
+    (BOOK[0] + pad_x) / WIDE_W * 100, BOOK[1] / wide.size[1] * 100,
+    bw / WIDE_W * 100, bh / wide.size[1] * 100))
+print('  mobile   left %.4f%%  top %.4f%%  width %.4f%%  height %.4f%%' % (
+    (BOOK[0] - max(0, BOOK[0] - mx)) / tw * 100, (BOOK[1] + TOP_EXT) / tight.size[1] * 100,
+    bw / tw * 100, bh / tight.size[1] * 100))

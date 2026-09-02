@@ -117,8 +117,25 @@ img{ max-width:100%; display:block; }
 
 /* ── Hero — the photograph is the masthead; no type over it ── */
 .hero{ position:relative; background:var(--kraft); }
+
+/* Alternate cover, revealed on hover.
+   Only the printed cover differs between the two states — the kraft, spine and
+   shadow all belong to the base crop — so this is just the book, positioned by
+   percentages derived from the same geometry the crops are built with
+   (tools/build-hero.py prints them). One to one at every viewport width.
+   Opacity only: compositor-driven, so the crossfade cannot jank. */
+img.hero__cover{
+  position:absolute; pointer-events:none;
+  left:30.0769%; top:10.8071%; width:39.4231%; height:54.7196%;
+  opacity:0; transition:opacity 900ms cubic-bezier(.33,0,.2,1);
+}
+@media (max-width:700px){
+  img.hero__cover{ left:7.2560%; top:23.4097%; width:85.4879%; height:50.8906%; }
+}
+@media (hover:hover){ .hero:hover img.hero__cover{ opacity:1; } }
+.hero.is-alt img.hero__cover{ opacity:1; }   /* tap, on touch devices */
 @media (max-width:700px){ .hero{ background:var(--kraft-top); } }
-.hero img{ width:100%; height:auto; }
+.hero > picture img{ width:100%; height:auto; display:block; }
 /* the desk lifts into the page */
 /* The desk lifts into the page. Multi-stop and eased: a two-stop linear
    gradient starts too abruptly and reads as a visible band. The photograph
@@ -374,6 +391,8 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
            alt="Unscripted Travel — an embossed dark green hardcover booklet with gold foil lettering, lying on kraft paper."
            fetchpriority="high" decoding="async">
     </picture>
+    <img class="hero__cover" src="assets/cover-penguin.jpg" width="1025" height="800"
+         alt="" aria-hidden="true" decoding="async" fetchpriority="low">
   </section>
 
   <!-- Manifesto -->
@@ -606,6 +625,12 @@ document.querySelectorAll('.reveal').forEach((el, i) => {
   el.style.transitionDelay = (i % 3) * 70 + 'ms';
   io.observe(el);
 });
+
+/* Touch devices have no hover — let a tap reveal the alternate cover */
+if (!window.matchMedia('(hover: hover)').matches) {
+  const hero = document.querySelector('.hero');
+  hero.addEventListener('pointerdown', () => hero.classList.toggle('is-alt'));
+}
 
 /* Enquiry form */
 const form = document.getElementById('enquiry');
