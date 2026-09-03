@@ -1149,11 +1149,21 @@ document.querySelectorAll('.reveal').forEach((el, i) => {
   if (/^#sheet-/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search);
   const startPage = 0;
 
+  // Single page, guaranteed in every browser. The library renders a two-page
+  // spread when the mount measures >= 2 x minWidth, and CSS width caps proved
+  // unreliable (Safari fell into the spread). So pin the mount width with a JS
+  // INLINE style — which no browser ignores — and turn off autoSize so the
+  // library can't override it. A fixed 440px mount can never reach the spread
+  // threshold. Verified single-page even with every CSS cap removed.
+  const PAGE_W = 440;
+  mount.style.width = PAGE_W + 'px';
+  mount.style.maxWidth = PAGE_W + 'px';
+  mount.style.margin = '0 auto';
   const pf = new St.PageFlip(mount, {
-    width: 400, height: 600, size: 'stretch',
-    minWidth: 280, maxWidth: 440, minHeight: 420, maxHeight: 660,
+    width: PAGE_W, height: Math.round(PAGE_W * 1.45), size: 'fixed',
+    autoSize: false, usePortrait: true,
     maxShadowOpacity: 0.4, drawShadow: true, showCover: false,
-    usePortrait: true, mobileScrollSupport: true, showPageCorners: true,
+    mobileScrollSupport: true, showPageCorners: true,
     swipeDistance: 30, flippingTime: 800, startPage: startPage
   });
   pf.loadFromHTML(pages);
