@@ -6,7 +6,7 @@ Static site. No build step — open `index.html`, or deploy the folder as-is.
 
 | Where | What to replace |
 |---|---|
-| `assets/` + `.plate` blocks | **One photograph — Simon's Town.** The other six are in. |
+| `assets/` | Nothing — all seven photographs are in. |
 | "In their words" section | The placeholder quote and attribution — currently marked `placeholder` on purpose. |
 | Footer | `hello@unscriptedtravel.co.za`, `+27 00 000 0000`, Instagram and WhatsApp links. |
 | `FORM_ENDPOINT` in the script | Enquiry destination. **Left empty it falls back to opening a pre-filled email**, so the form works either way. |
@@ -23,16 +23,10 @@ Replace the placeholder div with an image; the frame, ratio and caption stay as 
 <div class="plate"><img src="assets/winelands.jpg" alt="Vineyards above Franschhoek at dusk."></div>
 ```
 
-Six of the seven are in. Still outstanding:
+All seven are in. Still missing: **`assets/og.jpg`, 1200×630** — `og:image` is a
+relative path, so link previews render with no image at all.
 
-1. **Simon's Town** — 4:5 portrait, ~1000×1250 or larger. The caption promises
-   "Boulders, and the road that gets you there", so the coastal approach is the
-   better shot; penguins alone are the obvious one.
-
-Also still missing: **`assets/og.jpg`, 1200×630.** `og:image` is a relative path,
-so link previews render with no image at all.
-
-### The six that are in
+### The photographs
 
 Supplied as Cloudinary originals and cut to ratio here. Two arrived at the exact
 ratio; the rest were cropped, anchored so the subject survives rather than
@@ -42,14 +36,15 @@ centred blindly.
 |---|---|---|---|
 | Table Mountain | 1672×941 (16:9) | 1672×941 | none — already 16:9 |
 | The Winelands | 1122×1402 (4:5) | 1122×1402 | none — already 4:5 |
-| The Peninsula | 1023×1279 | 1023×1537 | vertical, anchor .78 — trims sky, keeps the spine |
-| Bo-Kaap | 1003×1254 | 1254×1254 | horizontal, centred |
-| Kirstenbosch | 819×1024 | 1536×1024 | horizontal, anchor .46 — landscape to portrait, keeps the walkway sweep |
-| The Seaboard | 1023×1279 | 1023×1537 | vertical, anchor .24 — trims foreground scrub, keeps the bay |
+| The Peninsula | 1023×1279 | 1023×1537 | vertical .78 — trims sky, keeps the spine |
+| Bo-Kaap | 1003×1254 | 1254×1254 | horizontal, centred in its arch |
+| Simon's Town | 1023×1279 | 1023×1537 | vertical .35 — trims empty tarmac, keeps the ridge |
+| Kirstenbosch | 819×1024 | 1536×1024 | horizontal .46 — landscape to portrait, keeps the walkway sweep |
+| The Seaboard | 1023×1279 | 1023×1537 | vertical .24 — trims foreground scrub, keeps the bay |
 
-All six are q82 progressive JPEG, 1.5MB together, and every one is below the
-fold, so they carry `loading="lazy"`. Portraits are sized for a 3× phone
-(~1050px), which is the largest they are ever drawn.
+All seven are q82 progressive JPEG, 1.8MB together, and every one sits below the
+fold, so they carry `loading="lazy"` and none of them touches first paint.
+Portraits are sized for a 3× phone (~1050px), the largest they are ever drawn.
 
 **The lead caption changed.** It read "Up the back path, before the cable car
 opens", which described a hiker's-eye view. The photograph supplied is the view
