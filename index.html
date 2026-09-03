@@ -104,7 +104,12 @@ img{ max-width:100%; display:block; }
 }
 .eyebrow:has(.idx){ display:flex; justify-content:space-between; align-items:baseline; gap:24px; }
 .idx{ font-size:.62rem; letter-spacing:.14em; white-space:nowrap; }
-.coord{ font-size:.58rem; letter-spacing:.08em; white-space:nowrap; }
+.coord{
+  font-size:.68rem; letter-spacing:.06em; white-space:nowrap;
+  /* the coordinate is the point, not a footnote — it reads at the name's size
+     and in the name's ink. The monospace keeps it the quieter of the two. */
+  color:var(--meta-c,var(--ink));
+}
 
 .section{ padding-block:var(--section); }
 .head--center{ text-align:center; }
