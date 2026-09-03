@@ -10,7 +10,7 @@
 <meta property="og:description" content="Bespoke Cape Town travel. We build the days around you.">
 <meta property="og:image" content="assets/booklet-wide.jpg">
 <meta property="og:type" content="website">
-<meta name="theme-color" content="#FFFFFF">
+<meta name="theme-color" content="#C4A375">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23454A35'/%3E%3Crect x='7' y='15' width='18' height='1.6' fill='%23D8BC7C'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,10 +28,10 @@
 :root{
   --ink:#2A2E26;
   --ink-soft:#5F6557;
-  --ink-faint:#74796B;   /* 4.6:1 on white */
-  --cream:#FFFFFF;      /* the page */
-  --cream-2:#F4F4F2;    /* the one recessed band */
-  --paper:#FFFFFF;      /* the photographed sheet, whitened to match */
+  --ink-faint:#666B5E;   /* 4.7:1 on cream */
+  --cream:#F2EDE3;      /* the page */
+  --cream-2:#E9E2D4;    /* the one recessed band */
+  --kraft:#BC9C70;      /* the photographed sheet, flattened to one tone */
   --cover:#454A35;
   --cover-lit:#565C47;
   --sage:#55654B;       /* display titles on light grounds — 5.37:1 on cream */
@@ -59,6 +59,8 @@ body{
   font-weight:400;
   font-size:clamp(1rem,.96rem + .2vw,1.06rem);
   line-height:1.75;
+  /* barely-there paper grain — the brand is a printed object */
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E");
 }
 
 img{ max-width:100%; display:block; }
@@ -116,15 +118,26 @@ img{ max-width:100%; display:block; }
 
 /* ── Hero — the photograph is the masthead; no type over it ── */
 /* The hero is a tall section with a pinned stage. Scrolling through it scales
-   the book gently and fades it into the white page, so you arrive in the site
+   the book gently and fades it into the page, so you arrive in the site
    rather than the hero simply scrolling off. Transform and opacity only. */
-.hero{ position:relative; background:var(--paper); }
+.hero{ position:relative; background:var(--kraft); }
 .js .hero{ height:170vh; }
 @media (prefers-reduced-motion:reduce){ .js .hero{ height:auto; } }
 
 .hero__stage{
   position:sticky; top:0; min-height:100vh; overflow:hidden;
   display:flex; flex-direction:column; justify-content:center;
+  /* The stage is taller than the photograph, so kraft shows above and below
+     it. tools/flatten-kraft.py divides the sheet's lighting grade out of both
+     crops so their edges land on one tone — this fill — and the join reads as
+     continuous paper rather than a band. Re-run it if the crops change; the
+     tone it prints is this value. */
+  /* Fill above and below the photograph. Matching the tone alone still read
+     as a panel — flat fill measured std 0.7 against the sheet's 3.4 — so the
+     fill is a seamless tile cut from the sheet itself, drawn at the same scale
+     the grain has inside the photograph. Both are built by
+     tools/flatten-kraft.py, which prints this size. */
+  background:url(assets/kraft-tile.jpg) 0 0/30.7692vw repeat, var(--kraft);
   /* vertical panning still scrolls the page; horizontal is ours, so a touch
      drag scrubs the wipe instead of being cancelled by the scroller */
   touch-action:pan-y;
@@ -149,7 +162,7 @@ img{ max-width:100%; display:block; }
 
 img.hero__cover{
   position:absolute; pointer-events:none;
-  left:30.0769%; top:14.0820%; width:39.4231%; height:71.3012%;
+  left:30.0769%; top:14.0820%; width:39.4231%; height:71.3013%;
   --wipe:-8%;
   -webkit-mask-image:linear-gradient(to right,
      #000 calc(var(--wipe) - 8%), transparent calc(var(--wipe) + 8%));
@@ -158,12 +171,36 @@ img.hero__cover{
   will-change:--wipe;
 }
 @media (max-width:700px){
-  img.hero__cover{ left:7.2560%; top:7.0248%; width:85.4879%; height:82.6446%; }
+  img.hero__cover{ left:7.2560%; top:27.6277%; width:85.4879%; height:60.0601%; }
 }
 @media (prefers-reduced-motion:reduce){ img.hero__cover{ will-change:auto; } }
-@media (max-width:700px){ .hero{ background:var(--kraft-top); } }
+/* the tight crop is narrower, so its grain lands at a different scale */
+@media (max-width:700px){ .hero__stage{ background-size:66.7223vw; } }
 .hero__art > picture img{ width:100%; height:auto; display:block; }
-/* the desk lifts into the page */
+
+/* The desk lifts into the page. Multi-stop and eased: a two-stop linear
+   gradient starts too abruptly and reads as a visible band. Anchored to the
+   foot of the tall hero, so it washes over the pinned stage exactly as the
+   book finishes fading and hands off to the cream page. */
+.hero::after{
+  content:''; position:absolute; inset:auto 0 -1px;
+  height:clamp(160px,22vw,300px);
+  background:linear-gradient(to bottom,
+    rgba(242,237,227,0)    0%,
+    rgba(242,237,227,.008) 10%,
+    rgba(242,237,227,.03)  20%,
+    rgba(242,237,227,.07)  30%,
+    rgba(242,237,227,.13)  40%,
+    rgba(242,237,227,.21)  50%,
+    rgba(242,237,227,.32)  60%,
+    rgba(242,237,227,.46)  70%,
+    rgba(242,237,227,.60)  78%,
+    rgba(242,237,227,.74)  85%,
+    rgba(242,237,227,.86)  91%,
+    rgba(242,237,227,.95)  96%,
+    rgba(242,237,227,1)   100%);
+  pointer-events:none;
+}
 
 .visually-hidden{
   position:absolute; width:1px; height:1px; overflow:hidden;
@@ -396,9 +433,9 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
       <div class="hero__art">
         <h1 class="visually-hidden">Unscripted Travel — Cape Town done your way</h1>
         <picture>
-          <source media="(max-width:700px)" srcset="assets/booklet-tight.jpg">
+          <source media="(max-width:700px)" srcset="assets/booklet-tight.jpg" width="1199" height="1332">
           <img src="assets/booklet-wide.jpg" width="2600" height="1122"
-               alt="Unscripted Travel — an embossed dark green hardcover booklet with gold foil lettering, lying on white paper."
+               alt="Unscripted Travel — an embossed dark green hardcover booklet with gold foil lettering, lying on kraft paper."
                fetchpriority="high" decoding="async">
         </picture>
         <img class="hero__cover" src="assets/cover-penguin.jpg" width="1025" height="800"
