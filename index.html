@@ -768,7 +768,7 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
         <p class="lede">The things people ask us to build in, by journey — prices per person, the trip itself quoted once we've spoken.</p>
       </div>
 
-      <div class="menu__book reveal">
+      <div class="menu__book">
         <div class="menu__index">
           <a class="menu__tab" href="#sheet-city">The city and the coast</a>
           <a class="menu__tab" href="#sheet-wider">Wider, and slower</a>
@@ -1147,9 +1147,11 @@ document.querySelectorAll('.reveal').forEach((el, i) => {
   const lastPage = pages.length - 1;
   mount.classList.add('menu__flip--live');
 
-  // open on a deep-linked tour if the hash names one, else on the closed cover
-  const hashTour = sheets.findIndex(s => '#' + s.id === location.hash);
-  const startPage = hashTour >= 0 ? hashTour + TOUR0 : 0;
+  // Always open on the cover. An earlier version wrote #sheet-… to the URL as you
+  // flipped, so a reload reopened mid-book and skipped the cover — clear any such
+  // stale hash (it would also make the browser scroll to that page on load).
+  if (/^#sheet-/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search);
+  const startPage = 0;
 
   const pf = new St.PageFlip(mount, {
     // narrow screens use a taller page so four add-ons fit the fixed box
@@ -1184,7 +1186,7 @@ document.querySelectorAll('.reveal').forEach((el, i) => {
     if (held === prev && prev.disabled) (next && !next.disabled ? next : mount).focus();
     else if (held === next && next.disabled) (prev && !prev.disabled ? prev : mount).focus();
     if (tour >= 0) {
-      history.replaceState(null, '', '#' + sheets[tour].id);
+      // deliberately not writing the URL hash — it made reloads skip the cover
       const name = sheets[tour].querySelector('.menu__tour');
       sr.textContent = 'Tour ' + (tour + 1) + ' of ' + sheets.length + ': ' + (name ? name.textContent : '');
     } else {
