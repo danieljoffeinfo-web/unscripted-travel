@@ -452,20 +452,16 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
 .menu__next{ --sx:3px; }
 .menu__sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap; }
 
-/* On a phone the flip page is a fixed box, so give it more room (wider column,
-   less gutter) and tighten the type/spacing so all four add-ons fit without the
-   page needing to scroll inside itself. */
+/* Hard guarantee of a single page (never a two-page spread): StPageFlip renders
+   a spread when the mount measures >= 2 x minWidth (560px). Some browsers
+   (Safari) measure it wider than the CSS cap, so pin the live mount to the cap
+   with !important — then getBlockWidth stays 440 < 560 and it is always portrait. */
+.menu__flip.stf__parent{ max-width:440px !important; min-width:0 !important; margin-inline:auto; }
+
+/* Phones show the stacked-card menu (the flip is gated to >=700px in the script),
+   so let the cards use the full column width. */
 @media (max-width:560px){
-  .section.menu > .wrap{ padding-inline:14px; }
   .menu__book{ max-width:none; }
-  .menu__flip--live .menu__sheet{ padding:22px 20px; }
-  .menu__flip--live .menu__tour{ font-size:1.15rem; }
-  .menu__flip--live .menu__head{ padding-bottom:2px; }
-  .menu__flip--live .menu__rows{ margin-top:10px; }
-  .menu__flip--live .menu__row{ padding:9px 0; gap:12px 18px; }
-  .menu__flip--live .menu__name{ font-size:.76rem; line-height:1.25; }
-  .menu__flip--live .menu__note{ font-size:.84rem; line-height:1.35; margin-top:3px; }
-  .menu__flip--live .menu__price{ font-size:.86rem; }
 }
 @media (prefers-reduced-motion:reduce){ .menu__arrow{ transition:none; } }
 
@@ -1099,21 +1095,21 @@ document.querySelectorAll('.reveal').forEach((el, i) => {
 })();
 
 /* ── The add-on menu: a flip-through booklet ──
-   The three tour pages are real, stacked, readable markup. With JS and motion
-   allowed, StPageFlip turns them like a book: a front and back cover are injected,
-   the pages become a spread (or a single page on a narrow screen), and a drag on
-   the corner turns them. Without JS, or with reduced motion, the pages stay
-   stacked cards and the index is plain in-page jump links. */
+   The three tour pages are real, stacked, readable markup. On tablet/desktop
+   (>=700px) with motion allowed, StPageFlip turns them like a book: a front and
+   back cover are injected and it renders one page at a time (pinned to a single
+   page in CSS), turned by dragging a corner or the controls. Without JS, with
+   reduced motion, or on phones, the pages stay stacked readable cards and the
+   index is plain in-page jump links. */
 (function () {
   const book  = document.querySelector('.menu__book');
   const mount = document.getElementById('addon-flip');
   if (!book || !mount || !window.St || !St.PageFlip) return;
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  // Very small screens can't hold a tour's four add-ons on a fixed page even
-  // when tuned; those keep the readable stacked cards. Everything from a normal
-  // phone up gets the flipbook, sized taller on narrow screens (below).
-  if (innerWidth < 340) return;
-  const narrow = innerWidth < 560;
+  // The page-turn is a tablet/desktop feature. A fixed-size flip page is cramped
+  // on a phone and the 3D turn is unreliable on mobile browsers, so phones keep
+  // the clean, always-rendering stacked-card menu below.
+  if (innerWidth < 700) return;
 
   const tabs   = Array.from(book.querySelectorAll('.menu__tab'));
   const sheets = Array.from(mount.querySelectorAll('.menu__sheet'));
@@ -1154,10 +1150,8 @@ document.querySelectorAll('.reveal').forEach((el, i) => {
   const startPage = 0;
 
   const pf = new St.PageFlip(mount, {
-    // narrow screens use a taller page so four add-ons fit the fixed box
-    width: narrow ? 360 : 400, height: narrow ? 668 : 600, size: 'stretch',
-    minWidth: narrow ? 300 : 280, maxWidth: narrow ? 520 : 440,
-    minHeight: narrow ? 556 : 420, maxHeight: narrow ? 960 : 660,
+    width: 400, height: 600, size: 'stretch',
+    minWidth: 280, maxWidth: 440, minHeight: 420, maxHeight: 660,
     maxShadowOpacity: 0.4, drawShadow: true, showCover: false,
     usePortrait: true, mobileScrollSupport: true, showPageCorners: true,
     swipeDistance: 30, flippingTime: 800, startPage: startPage
