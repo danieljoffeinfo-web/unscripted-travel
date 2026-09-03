@@ -349,6 +349,111 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
 }
 .journey__cta:hover,.journey__cta:focus-visible{ border-bottom-color:var(--ink); }
 
+/* ── Add-on menu: a sheet you turn ───────────────────────────────
+   The plate caption reused as a bill of fare — name left, price right in the
+   mono voice, hairline between. All three sheets are real markup; the script
+   upgrades the index to a tablist and animates between them. With no JS the
+   sheets stack and every price stays readable. ── */
+.menu__book{
+  position:relative; max-width:720px; margin:clamp(40px,5vw,72px) auto 0;
+  padding:clamp(26px,3.4vw,44px) clamp(22px,3.4vw,44px);
+  border:1px solid rgba(176,141,79,.32); background:var(--cream-2);
+}
+/* registration ticks, clear of the trim — the plates carry these too */
+.menu__book::before,.menu__book::after{
+  content:''; position:absolute; width:9px; height:9px;
+  border:1px solid var(--gold); opacity:.55; pointer-events:none;
+}
+.menu__book::before{ top:-6px; left:-6px; border-right:0; border-bottom:0; }
+.menu__book::after{ bottom:-6px; right:-6px; border-left:0; border-top:0; }
+
+/* the index of journeys — jump links with no JS, a tablist once upgraded */
+.menu__index{
+  display:flex; flex-wrap:wrap; gap:4px; margin-bottom:clamp(20px,2.6vw,30px);
+  padding-bottom:14px; border-bottom:1px solid rgba(42,46,38,.14);
+}
+.menu__tab{
+  appearance:none; border:0; background:none; cursor:pointer;
+  font-family:var(--mono); font-size:.62rem; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--ink-faint); text-decoration:none; padding:7px 12px;
+  border-bottom:1px solid transparent; transition:color .25s ease,border-color .25s ease;
+}
+.menu__tab:hover,.menu__tab:focus-visible{ color:var(--ink); }
+.menu__tab[aria-selected="true"]{ color:var(--ink); border-bottom-color:var(--gold); }
+
+.menu__stage{ position:relative; }
+.js .menu__stage{ display:grid; touch-action:pan-y; }
+.js .menu__sheet{ grid-area:1/1; }
+/* stacked and separated when there is no JS to page between them */
+.menu__sheet + .menu__sheet{ margin-top:clamp(30px,4vw,48px); }
+.js .menu__sheet + .menu__sheet{ margin-top:0; }
+.menu__sheet{ scroll-margin-top:24px; }
+
+/* JS mode: only the active sheet shows; the rest wait, offset and hidden */
+.js .menu__sheet{
+  opacity:0; visibility:hidden; transform:translateX(var(--x,0));
+  transition:opacity .32s ease,
+             transform .32s cubic-bezier(.22,.61,.36,1),
+             visibility 0s linear .32s;
+}
+.js .menu__sheet.is-active{
+  opacity:1; visibility:visible; transform:none;
+  transition:opacity .32s ease,
+             transform .32s cubic-bezier(.22,.61,.36,1),
+             visibility 0s;
+}
+
+.menu__head{ display:flex; justify-content:space-between; align-items:baseline; gap:20px; }
+.menu__len{
+  font-family:var(--mono); font-size:.66rem; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--ink-faint); margin:0 0 .5rem;
+}
+.menu__tour{
+  font-weight:300; text-transform:uppercase; letter-spacing:var(--track-title);
+  font-size:clamp(1.15rem,1rem + .8vw,1.6rem); margin:0; color:var(--sage);
+}
+.menu__count{ flex:0 0 auto; }
+.menu__unit{ margin:.7rem 0 0; font-size:.9rem; color:var(--ink-soft); }
+
+.menu__rows{ list-style:none; margin:clamp(14px,2vw,20px) 0 0; padding:0; }
+.menu__row{
+  display:flex; justify-content:space-between; align-items:baseline; gap:16px 28px;
+  padding:clamp(15px,2vw,20px) 0; border-top:1px solid rgba(42,46,38,.14);
+}
+.menu__item{ min-width:0; }
+.menu__name{
+  display:block; font-weight:500; font-size:.82rem; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--ink);
+}
+.menu__note{ display:block; margin-top:5px; color:var(--ink-soft); font-size:.95rem; text-wrap:pretty; }
+.menu__price{ flex:0 0 auto; font-size:.92rem; }   /* .coord: mono, tabular-nums, ink */
+
+/* the pager — nothing to do without JS, so hidden until the script shows it */
+.menu__pager{
+  display:flex; justify-content:space-between; align-items:center; gap:16px;
+  margin-top:clamp(20px,2.6vw,30px); padding-top:16px;
+  border-top:1px solid rgba(42,46,38,.14);
+}
+/* an explicit display beats the UA [hidden] rule, so restore it: the pager
+   does nothing without JS and must stay hidden until the script un-hides it */
+.menu__pager[hidden]{ display:none; }
+.menu__nav{
+  appearance:none; border:0; background:none; cursor:pointer;
+  font-family:var(--mono); font-size:.64rem; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--ink); padding:8px 2px; display:inline-flex; align-items:center; gap:9px;
+  transition:opacity .25s ease;
+}
+.menu__nav[disabled]{ opacity:.28; cursor:default; }
+.menu__arrow{ display:inline-block; transition:transform .25s ease; }
+.menu__nav:not([disabled]):hover .menu__arrow{ transform:translateX(var(--sx,0)); }
+.menu__prev{ --sx:-3px; }
+.menu__next{ --sx:3px; }
+
+@media (prefers-reduced-motion:reduce){
+  .js .menu__sheet, .js .menu__sheet.is-active{ transition:opacity .001s; transform:none; }
+  .menu__arrow{ transition:none; }
+}
+
 /* ── Words (client supplies the real quote) ── */
 .words{ text-align:center; }
 .words blockquote{
@@ -449,6 +554,11 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
 :where(a,button,input,select,textarea):focus-visible{
   outline:2px solid var(--gold); outline-offset:3px;
 }
+/* the tabpanel is focusable (its rows hold no focusable children, so keyboard
+   users reach the content by focusing the panel); give it the brand ring, not
+   the UA default, and only for keyboard focus */
+.menu__sheet:focus-visible{ outline:2px solid var(--gold); outline-offset:6px; }
+.menu__sheet:focus:not(:focus-visible){ outline:none; }
 
 /* ── Reveal: opacity + transform only (compositor-only, cannot jank).
       Scoped to .js so the page still renders if JavaScript never runs. ── */
@@ -522,7 +632,7 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
   <section class="section" id="experiences">
     <div class="wrap">
       <div class="reveal">
-        <p class="eyebrow">What the days are made of<span class="idx">01 / 04</span></p>
+        <p class="eyebrow">What the days are made of<span class="idx">01 / 05</span></p>
         <h2 class="title">Experiences</h2>
         <hr class="rule">
         <p class="lede">A shortlist, not a menu. Every trip is assembled from scratch — these are simply the things Cape Town does better than anywhere else.</p>
@@ -572,7 +682,7 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
   <section class="section" id="how">
     <div class="wrap">
       <div class="reveal">
-        <p class="eyebrow">The process<span class="idx">02 / 04</span></p>
+        <p class="eyebrow">The process<span class="idx">02 / 05</span></p>
         <h2 class="title">How it works</h2>
         <hr class="rule">
       </div>
@@ -597,7 +707,7 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
   <section class="section journeys" id="journeys">
     <div class="wrap">
       <div class="reveal">
-        <p class="eyebrow">Starting points<span class="idx">03 / 04</span></p>
+        <p class="eyebrow">Starting points<span class="idx">03 / 05</span></p>
         <h2 class="title">Journeys</h2>
         <hr class="rule">
         <p class="lede">Three shapes people tend to start from. Each one gets rebuilt around you — treat them as a sense of pace, not a package.</p>
@@ -631,6 +741,155 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
     </div>
   </section>
 
+  <!-- Add-on menu: a sheet you turn. All three journeys ship as real markup;
+       the script upgrades the index to a tablist and pages between them. -->
+  <section class="section menu" id="add-ons">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="eyebrow">Add to any journey<span class="idx">04 / 05</span></p>
+        <h2 class="title">Add-ons</h2>
+        <hr class="rule">
+        <p class="lede">The things people ask us to build in, by journey. Turn the sheet to change tour; the trip itself is quoted once we've spoken.</p>
+      </div>
+
+      <div class="menu__book reveal">
+        <div class="menu__index">
+          <a class="menu__tab" href="#sheet-city">The city and the coast</a>
+          <a class="menu__tab" href="#sheet-wider">Wider, and slower</a>
+          <a class="menu__tab" href="#sheet-whole">The whole thing</a>
+        </div>
+
+        <div class="menu__stage">
+        <article class="menu__sheet is-active" id="sheet-city">
+          <header class="menu__head">
+            <div>
+              <p class="menu__len">Four days</p>
+              <h3 class="menu__tour">The city and the coast</h3>
+            </div>
+            <span class="menu__count coord">01 / 03</span>
+          </header>
+          <p class="menu__unit">Per person, added to the trip. Prices are indicative until we've spoken.</p>
+          <ul class="menu__rows">
+          <li class="menu__row">
+            <div class="menu__item">
+              <span class="menu__name">Helicopter transfer to Cape Point</span>
+              <span class="menu__note">A loop over the peninsula on the way down, weather permitting.</span>
+            </div>
+            <span class="menu__price coord">R 0 000</span>
+          </li>
+          <li class="menu__row">
+            <div class="menu__item">
+              <span class="menu__name">Private cellar tasting, Constantia</span>
+              <span class="menu__note">The oldest wine estate in the country, by appointment.</span>
+            </div>
+            <span class="menu__price coord">R 0 000</span>
+          </li>
+          <li class="menu__row">
+            <div class="menu__item">
+              <span class="menu__name">Sunset dhow off the Atlantic Seaboard</span>
+              <span class="menu__note">An hour on the water as the light goes.</span>
+            </div>
+            <span class="menu__price coord">R 0 000</span>
+          </li>
+          <li class="menu__row">
+            <div class="menu__item">
+              <span class="menu__name">Chef's table, one evening</span>
+              <span class="menu__note">A seat in the kitchen instead of the dining room.</span>
+            </div>
+            <span class="menu__price coord">R 0 000</span>
+          </li>
+          </ul>
+        </article>
+        <article class="menu__sheet" id="sheet-wider">
+          <header class="menu__head">
+            <div>
+              <p class="menu__len">Seven days</p>
+              <h3 class="menu__tour">Wider, and slower</h3>
+            </div>
+            <span class="menu__count coord">02 / 03</span>
+          </header>
+          <p class="menu__unit">Per person, added to the trip. Prices are indicative until we've spoken.</p>
+          <ul class="menu__rows">
+          <li class="menu__row">
+            <div class="menu__item">
+              <span class="menu__name">Franschhoek by private car</span>
+              <span class="menu__note">The estates on your own timetable, not the wine tram's.</span>
+            </div>
+            <span class="menu__price coord">R 0 000</span>
+          </li>
+          <li class="menu__row">
+            <div class="menu__item">
+              <span class="menu__name">Cape Town food walk, Bo-Kaap</span>
+              <span class="menu__note">The neighbourhood and the market, with someone who cooks.</span>
+            </div>
+            <span class="menu__price coord">R 0 000</span>
+          </li>
+          <li class="menu__row">
+            <div class="menu__item">
+              <span class="menu__name">Whale watching from Hermanus</span>
+              <span class="menu__note">Boat-based, in season — roughly June to November.</span>
+            </div>
+            <span class="menu__price coord">R 0 000</span>
+          </li>
+          <li class="menu__row">
+            <div class="menu__item">
+              <span class="menu__name">A day in the Cederberg</span>
+              <span class="menu__note">Rock art and the pass road up, an early start.</span>
+            </div>
+            <span class="menu__price coord">R 0 000</span>
+          </li>
+          </ul>
+        </article>
+        <article class="menu__sheet" id="sheet-whole">
+          <header class="menu__head">
+            <div>
+              <p class="menu__len">Ten days or more</p>
+              <h3 class="menu__tour">The whole thing</h3>
+            </div>
+            <span class="menu__count coord">03 / 03</span>
+          </header>
+          <p class="menu__unit">Per person, added to the trip. Prices are indicative until we've spoken.</p>
+          <ul class="menu__rows">
+          <li class="menu__row">
+            <div class="menu__item">
+              <span class="menu__name">Private reserve, two nights</span>
+              <span class="menu__note">Big Five, guided game drives, full board.</span>
+            </div>
+            <span class="menu__price coord">R 0 000</span>
+          </li>
+          <li class="menu__row">
+            <div class="menu__item">
+              <span class="menu__name">Garden Route with a guide</span>
+              <span class="menu__note">Knysna, the forests and the passes, at your pace.</span>
+            </div>
+            <span class="menu__price coord">R 0 000</span>
+          </li>
+          <li class="menu__row">
+            <div class="menu__item">
+              <span class="menu__name">Robben Island and District Six</span>
+              <span class="menu__note">The history told properly, by people who lived it.</span>
+            </div>
+            <span class="menu__price coord">R 0 000</span>
+          </li>
+          <li class="menu__row">
+            <div class="menu__item">
+              <span class="menu__name">Light-aircraft leg to the reserve</span>
+              <span class="menu__note">Skip the drive east — an hour in the air instead.</span>
+            </div>
+            <span class="menu__price coord">R 0 000</span>
+          </li>
+          </ul>
+        </article>
+        </div>
+
+        <div class="menu__pager" hidden>
+          <button type="button" class="menu__nav menu__prev"><span class="menu__arrow" aria-hidden="true">&lsaquo;</span> Previous tour</button>
+          <button type="button" class="menu__nav menu__next">Next tour <span class="menu__arrow" aria-hidden="true">&rsaquo;</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Words — REPLACE with a real client quote before launch -->
   <section class="section words">
     <div class="wrap reveal">
@@ -645,7 +904,7 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
   <section class="section enquire" id="enquire">
     <div class="wrap">
       <div class="reveal">
-        <p class="eyebrow">Start here<span class="idx">04 / 04</span></p>
+        <p class="eyebrow">Start here<span class="idx">05 / 05</span></p>
         <h2 class="title">Tell us what you like</h2>
         <hr class="rule">
         <p class="lede">No deposit, no obligation. We reply within one working day with a first idea of the shape your trip could take.</p>
@@ -823,6 +1082,123 @@ document.querySelectorAll('.reveal').forEach((el, i) => {
   addEventListener('scroll', onScroll, { passive: true });
   addEventListener('resize', onScroll, { passive: true });
   update();
+})();
+
+/* ── The add-on menu: a sheet you turn ──
+   Static markup ships all three sheets and an index of jump-links, so every
+   price is readable with no JavaScript. Here the index becomes a real tablist,
+   the inactive sheets are hidden, the change is animated (direction-aware,
+   transform + opacity only), and the URL hash is kept in sync so a sheet links.
+   ARIA roles are applied here, never in the static markup: a role="tab" that
+   does not behave like one is worse than none. */
+(function () {
+  const book = document.querySelector('.menu__book');
+  if (!book) return;
+  const index  = book.querySelector('.menu__index');
+  const tabs   = Array.from(book.querySelectorAll('.menu__tab'));
+  const sheets = Array.from(book.querySelectorAll('.menu__sheet'));
+  const stage  = book.querySelector('.menu__stage');
+  const pager  = book.querySelector('.menu__pager');
+  const prev   = book.querySelector('.menu__prev');
+  const next   = book.querySelector('.menu__next');
+  if (!index || !stage || tabs.length === 0 || tabs.length !== sheets.length) return;
+
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const OFFSET = 14;
+
+  index.setAttribute('role', 'tablist');
+  index.setAttribute('aria-label', 'Journeys');
+  tabs.forEach((tab, i) => {
+    const panel = sheets[i];
+    if (!tab.id)   tab.id   = 'menu-tab-' + i;
+    if (!panel.id) panel.id = 'menu-sheet-' + i;
+    tab.setAttribute('role', 'tab');
+    tab.setAttribute('aria-controls', panel.id);
+    panel.setAttribute('role', 'tabpanel');
+    panel.setAttribute('aria-labelledby', tab.id);
+    panel.setAttribute('tabindex', '0');
+  });
+  if (pager) pager.hidden = false;
+
+  let current = sheets.findIndex(s => s.classList.contains('is-active'));
+  if (current < 0) current = 0;
+  const hashIdx = sheets.findIndex(s => '#' + s.id === location.hash);
+  if (hashIdx >= 0) current = hashIdx;
+
+  function place(sheet, x) {          // snap to an offset with no transition (FLIP)
+    sheet.style.transition = 'none';
+    sheet.style.setProperty('--x', x + 'px');
+    void sheet.offsetWidth;           // commit the snap
+    sheet.style.transition = '';      // hand animation back to the CSS rule
+  }
+
+  function render(to, dir, moveFocus, writeHash) {
+    to = (to + sheets.length) % sheets.length;
+    const from = current;
+    tabs.forEach((t, i) => {
+      const sel = i === to;
+      t.setAttribute('aria-selected', sel ? 'true' : 'false');
+      t.tabIndex = sel ? 0 : -1;
+    });
+    if (from !== to && dir && !reduce) {
+      place(sheets[to], dir * OFFSET);
+      sheets[to].classList.add('is-active');            // slides in from `dir`
+      sheets[from].style.setProperty('--x', (-dir * OFFSET) + 'px');
+      sheets[from].classList.remove('is-active');       // slides out the far side
+    } else {
+      sheets.forEach((sh, i) => sh.classList.toggle('is-active', i === to));
+    }
+    current = to;
+    // disabling the control that holds focus drops focus to <body> and strands
+    // the keyboard user at the top of the page, so move focus off it first
+    const hadFocus = document.activeElement;
+    if (prev) prev.disabled = to === 0;
+    if (next) next.disabled = to === sheets.length - 1;
+    if (hadFocus === prev && prev.disabled) (next && !next.disabled ? next : tabs[to]).focus();
+    else if (hadFocus === next && next.disabled) (prev && !prev.disabled ? prev : tabs[to]).focus();
+    if (writeHash) history.replaceState(null, '', '#' + sheets[to].id);
+    if (moveFocus) tabs[to].focus();
+  }
+
+  render(current, 0, false, false);   // initial paint, no animation, no hash write
+
+  tabs.forEach((tab, i) => {
+    tab.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (i !== current) render(i, i > current ? 1 : -1, false, true);
+    });
+    tab.addEventListener('keydown', (e) => {
+      // dir follows the key, not n>current — on a wrap the modulo crosses the
+      // whole range and n>current would invert the slide
+      let n = null, dir = 1;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { n = (current + 1) % tabs.length; dir = 1; }
+      else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { n = (current - 1 + tabs.length) % tabs.length; dir = -1; }
+      else if (e.key === 'Home') { n = 0; dir = -1; }
+      else if (e.key === 'End') { n = tabs.length - 1; dir = 1; }
+      else return;
+      e.preventDefault();
+      render(n, dir, true, true);
+    });
+  });
+
+  if (prev) prev.addEventListener('click', () => { if (current > 0) render(current - 1, -1, false, true); });
+  if (next) next.addEventListener('click', () => { if (current < sheets.length - 1) render(current + 1, 1, false, true); });
+
+  /* swipe to turn on touch; touch-action:pan-y keeps vertical scroll ours-free */
+  let sx = 0, sy = 0, tracking = false;
+  stage.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse') return;
+    sx = e.clientX; sy = e.clientY; tracking = true;
+  });
+  stage.addEventListener('pointerup', (e) => {
+    if (!tracking) return; tracking = false;
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      if (dx < 0 && current < sheets.length - 1) render(current + 1, 1, false, true);
+      else if (dx > 0 && current > 0) render(current - 1, -1, false, true);
+    }
+  });
+  stage.addEventListener('pointercancel', () => { tracking = false; });
 })();
 
 /* Enquiry form */
