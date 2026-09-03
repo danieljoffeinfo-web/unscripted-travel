@@ -349,27 +349,24 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
 }
 .journey__cta:hover,.journey__cta:focus-visible{ border-bottom-color:var(--ink); }
 
-/* ── Add-on menu: a sheet you turn ───────────────────────────────
-   The plate caption reused as a bill of fare — name left, price right in the
-   mono voice, hairline between. All three sheets are real markup; the script
-   upgrades the index to a tablist and animates between them. With no JS the
-   sheets stack and every price stays readable. ── */
-.menu__book{
-  position:relative; max-width:720px; margin:clamp(40px,5vw,72px) auto 0;
-  padding:clamp(26px,3.4vw,44px) clamp(22px,3.4vw,44px);
-  border:1px solid rgba(176,141,79,.32); background:var(--cream-2);
-}
-/* registration ticks, clear of the trim — the plates carry these too */
-.menu__book::before,.menu__book::after{
-  content:''; position:absolute; width:9px; height:9px;
-  border:1px solid var(--gold); opacity:.55; pointer-events:none;
-}
-.menu__book::before{ top:-6px; left:-6px; border-right:0; border-bottom:0; }
-.menu__book::after{ bottom:-6px; right:-6px; border-left:0; border-top:0; }
+/* ── Add-on menu: a flip-through booklet ─────────────────────────
+   The pages are the site's bill of fare — name left, price right in the mono
+   voice. StPageFlip (assets/page-flip.min.js) turns them like a real book: drag
+   a corner, or use the index and the pager. It runs only with JS and with motion
+   allowed; without either, the pages fall back to readable stacked cards and the
+   index becomes plain in-page jump links. Portrait shows one page; a wide screen
+   shows a two-page spread. ── */
+/* The whole menu column is capped at the single-page width. StPageFlip decides
+   orientation from the mount's container width (it overrides any max-width set on
+   the mount itself), and picks a two-page spread once that is >= 2 x minWidth
+   (560px). Keeping the column at 440 holds it to ONE page on every viewport —
+   the index and pager align to the card width, and the single-page index / hash
+   / pager logic below stays correct. */
+.menu__book{ max-width:440px; margin:clamp(40px,5vw,72px) auto 0; }
 
-/* the index of journeys — jump links with no JS, a tablist once upgraded */
+/* the index — jump links with no JS, page pickers once the book is live */
 .menu__index{
-  display:flex; flex-wrap:wrap; gap:4px; margin-bottom:clamp(20px,2.6vw,30px);
+  display:flex; flex-wrap:wrap; gap:4px; margin-bottom:clamp(18px,2.4vw,26px);
   padding-bottom:14px; border-bottom:1px solid rgba(42,46,38,.14);
 }
 .menu__tab{
@@ -379,63 +376,58 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
   border-bottom:1px solid transparent; transition:color .25s ease,border-color .25s ease;
 }
 .menu__tab:hover,.menu__tab:focus-visible{ color:var(--ink); }
-.menu__tab[aria-selected="true"]{ color:var(--ink); border-bottom-color:var(--gold); }
+.menu__tab[aria-current]{ color:var(--ink); border-bottom-color:var(--gold); }
 
-.menu__stage{ position:relative; }
-.js .menu__stage{ display:grid; touch-action:pan-y; }
-.js .menu__sheet{ grid-area:1/1; }
-/* stacked and separated when there is no JS to page between them */
-.menu__sheet + .menu__sheet{ margin-top:clamp(30px,4vw,48px); }
-.js .menu__sheet + .menu__sheet{ margin-top:0; }
-.menu__sheet{ scroll-margin-top:24px; }
+/* the flip mount — one page, never a two-page spread (see .menu__book) */
+.menu__flip{ position:relative; }
+.menu__flip--live{ touch-action:pan-y; }
+.menu__flip:focus-visible{ outline:2px solid var(--gold); outline-offset:8px; }
+.menu__flip--live .stf__item{ box-shadow:0 6px 24px rgba(42,46,38,.14); }
 
-/* JS mode: only the active sheet shows; the rest wait, offset and hidden */
-.js .menu__sheet{
-  opacity:0; visibility:hidden; transform:translateX(var(--x,0));
-  transition:opacity .32s ease,
-             transform .32s cubic-bezier(.22,.61,.36,1),
-             visibility 0s linear .32s;
+/* a page — a bordered card when stacked (no JS / reduced motion), a book page when live */
+.menu__sheet{
+  background:var(--cream-2); box-sizing:border-box;
+  padding:clamp(24px,3.2vw,40px) clamp(20px,3vw,40px);
+  border:1px solid rgba(176,141,79,.32); scroll-margin-top:24px;
 }
-.js .menu__sheet.is-active{
-  opacity:1; visibility:visible; transform:none;
-  transition:opacity .32s ease,
-             transform .32s cubic-bezier(.22,.61,.36,1),
-             visibility 0s;
+.menu__sheet + .menu__sheet{ margin-top:clamp(24px,3.2vw,40px); }
+/* fill the page; scroll rather than silently clip if content ever exceeds it
+   (mobileScrollSupport keeps a vertical drag scrolling instead of flipping) */
+.menu__flip--live .menu__sheet{ margin:0; height:100%; overflow-y:auto; overflow-x:hidden; }
+.menu__flip--live .menu__row{ padding:clamp(10px,1.5vw,15px) 0; }
+.menu__flip--live .menu__rows{ margin-top:clamp(12px,1.7vw,18px); }
+
+/* the cover pages, injected by the script — decoration the fallback skips */
+.menu__cover{
+  background:var(--cover); color:var(--cream); box-sizing:border-box; height:100%;
+  display:flex; flex-direction:column; padding:clamp(30px,4vw,52px);
+  border:1px solid rgba(216,188,124,.3);
 }
+.menu__cover .mk{ font-weight:500; font-size:.76rem; letter-spacing:.3em; text-transform:uppercase; color:var(--gold-lit); margin:0; }
+.menu__cover h3{ font-weight:300; text-transform:uppercase; letter-spacing:.16em; font-size:clamp(1.4rem,1.1rem + 1.4vw,2rem); margin:1.1rem 0 0; color:var(--sage-lit); }
+.menu__cover .rule{ background:var(--gold-lit); margin-top:1.3rem; }
+.menu__cover .cover__foot{ margin-top:auto; }
+.menu__cover .hint{ font-family:var(--mono); font-size:.6rem; letter-spacing:.12em; text-transform:uppercase; color:rgba(242,237,227,.74); margin:0; }
+.menu__cover a{ color:var(--cream); }
 
 .menu__head{ display:flex; justify-content:space-between; align-items:baseline; gap:20px; }
-.menu__len{
-  font-family:var(--mono); font-size:.66rem; letter-spacing:.18em;
-  text-transform:uppercase; color:var(--ink-faint); margin:0 0 .5rem;
-}
-.menu__tour{
-  font-weight:300; text-transform:uppercase; letter-spacing:var(--track-title);
-  font-size:clamp(1.15rem,1rem + .8vw,1.6rem); margin:0; color:var(--sage);
-}
+.menu__len{ font-family:var(--mono); font-size:.66rem; letter-spacing:.18em; text-transform:uppercase; color:var(--ink-faint); margin:0 0 .5rem; }
+.menu__tour{ font-weight:300; text-transform:uppercase; letter-spacing:var(--track-title); font-size:clamp(1.1rem,1rem + .7vw,1.5rem); margin:0; color:var(--sage); }
 .menu__count{ flex:0 0 auto; }
-.menu__unit{ margin:.7rem 0 0; font-size:.9rem; color:var(--ink-soft); }
 
 .menu__rows{ list-style:none; margin:clamp(14px,2vw,20px) 0 0; padding:0; }
-.menu__row{
-  display:flex; justify-content:space-between; align-items:baseline; gap:16px 28px;
-  padding:clamp(15px,2vw,20px) 0; border-top:1px solid rgba(42,46,38,.14);
-}
+.menu__row{ display:flex; justify-content:space-between; align-items:baseline; gap:14px 24px; padding:clamp(12px,1.7vw,17px) 0; border-top:1px solid rgba(42,46,38,.14); }
 .menu__item{ min-width:0; }
-.menu__name{
-  display:block; font-weight:500; font-size:.82rem; letter-spacing:.06em;
-  text-transform:uppercase; color:var(--ink);
-}
-.menu__note{ display:block; margin-top:5px; color:var(--ink-soft); font-size:.95rem; text-wrap:pretty; }
-.menu__price{ flex:0 0 auto; font-size:.92rem; }   /* .coord: mono, tabular-nums, ink */
+.menu__name{ display:block; font-weight:500; font-size:.8rem; letter-spacing:.05em; text-transform:uppercase; color:var(--ink); line-height:1.3; }
+.menu__note{ display:block; margin-top:4px; color:var(--ink-soft); font-size:.9rem; line-height:1.45; text-wrap:pretty; }
+.menu__price{ flex:0 0 auto; font-size:.9rem; }
 
-/* the pager — nothing to do without JS, so hidden until the script shows it */
+/* pager — hidden until the script shows it (explicit display beats [hidden]) */
 .menu__pager{
   display:flex; justify-content:space-between; align-items:center; gap:16px;
-  margin-top:clamp(20px,2.6vw,30px); padding-top:16px;
+  margin-top:clamp(18px,2.4vw,26px); padding-top:16px;
   border-top:1px solid rgba(42,46,38,.14);
 }
-/* an explicit display beats the UA [hidden] rule, so restore it: the pager
-   does nothing without JS and must stay hidden until the script un-hides it */
 .menu__pager[hidden]{ display:none; }
 .menu__nav{
   appearance:none; border:0; background:none; cursor:pointer;
@@ -448,11 +440,9 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
 .menu__nav:not([disabled]):hover .menu__arrow{ transform:translateX(var(--sx,0)); }
 .menu__prev{ --sx:-3px; }
 .menu__next{ --sx:3px; }
+.menu__sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap; }
 
-@media (prefers-reduced-motion:reduce){
-  .js .menu__sheet, .js .menu__sheet.is-active{ transition:opacity .001s; transform:none; }
-  .menu__arrow{ transition:none; }
-}
+@media (prefers-reduced-motion:reduce){ .menu__arrow{ transition:none; } }
 
 /* ── Words (client supplies the real quote) ── */
 .words{ text-align:center; }
@@ -741,15 +731,16 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
     </div>
   </section>
 
-  <!-- Add-on menu: a sheet you turn. All three journeys ship as real markup;
-       the script upgrades the index to a tablist and pages between them. -->
+  <!-- Add-on menu: a flip-through booklet. The three tour pages ship as real,
+       stacked, readable markup; the script injects the covers and turns them
+       with StPageFlip (assets/page-flip.min.js). -->
   <section class="section menu" id="add-ons">
     <div class="wrap">
       <div class="reveal">
         <p class="eyebrow">Add to any journey<span class="idx">04 / 05</span></p>
         <h2 class="title">Add-ons</h2>
         <hr class="rule">
-        <p class="lede">The things people ask us to build in, by journey. Turn the sheet to change tour; the trip itself is quoted once we've spoken.</p>
+        <p class="lede">The things people ask us to build in, by journey — prices per person, the trip itself quoted once we've spoken.</p>
       </div>
 
       <div class="menu__book reveal">
@@ -759,8 +750,8 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
           <a class="menu__tab" href="#sheet-whole">The whole thing</a>
         </div>
 
-        <div class="menu__stage">
-        <article class="menu__sheet is-active" id="sheet-city">
+        <div class="menu__flip" id="addon-flip">
+        <article class="page menu__sheet" id="sheet-city">
           <header class="menu__head">
             <div>
               <p class="menu__len">Four days</p>
@@ -768,7 +759,6 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
             </div>
             <span class="menu__count coord">01 / 03</span>
           </header>
-          <p class="menu__unit">Per person, added to the trip. Prices are indicative until we've spoken.</p>
           <ul class="menu__rows">
           <li class="menu__row">
             <div class="menu__item">
@@ -800,7 +790,7 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
           </li>
           </ul>
         </article>
-        <article class="menu__sheet" id="sheet-wider">
+        <article class="page menu__sheet" id="sheet-wider">
           <header class="menu__head">
             <div>
               <p class="menu__len">Seven days</p>
@@ -808,7 +798,6 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
             </div>
             <span class="menu__count coord">02 / 03</span>
           </header>
-          <p class="menu__unit">Per person, added to the trip. Prices are indicative until we've spoken.</p>
           <ul class="menu__rows">
           <li class="menu__row">
             <div class="menu__item">
@@ -840,7 +829,7 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
           </li>
           </ul>
         </article>
-        <article class="menu__sheet" id="sheet-whole">
+        <article class="page menu__sheet" id="sheet-whole">
           <header class="menu__head">
             <div>
               <p class="menu__len">Ten days or more</p>
@@ -848,7 +837,6 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
             </div>
             <span class="menu__count coord">03 / 03</span>
           </header>
-          <p class="menu__unit">Per person, added to the trip. Prices are indicative until we've spoken.</p>
           <ul class="menu__rows">
           <li class="menu__row">
             <div class="menu__item">
@@ -883,8 +871,8 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
         </div>
 
         <div class="menu__pager" hidden>
-          <button type="button" class="menu__nav menu__prev"><span class="menu__arrow" aria-hidden="true">&lsaquo;</span> Previous tour</button>
-          <button type="button" class="menu__nav menu__next">Next tour <span class="menu__arrow" aria-hidden="true">&rsaquo;</span></button>
+          <button type="button" class="menu__nav menu__prev" aria-label="Previous page"><span class="menu__arrow" aria-hidden="true">&lsaquo;</span> Previous</button>
+          <button type="button" class="menu__nav menu__next" aria-label="Next page">Next <span class="menu__arrow" aria-hidden="true">&rsaquo;</span></button>
         </div>
       </div>
     </div>
@@ -981,6 +969,7 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
   </div>
 </footer>
 
+<script src="assets/page-flip.min.js"></script>
 <script>
 /* ── Set this to your form endpoint (Formspree, Supabase fn, etc.).
       Left empty, the form falls back to opening a pre-filled email. ── */
@@ -1084,121 +1073,115 @@ document.querySelectorAll('.reveal').forEach((el, i) => {
   update();
 })();
 
-/* ── The add-on menu: a sheet you turn ──
-   Static markup ships all three sheets and an index of jump-links, so every
-   price is readable with no JavaScript. Here the index becomes a real tablist,
-   the inactive sheets are hidden, the change is animated (direction-aware,
-   transform + opacity only), and the URL hash is kept in sync so a sheet links.
-   ARIA roles are applied here, never in the static markup: a role="tab" that
-   does not behave like one is worse than none. */
+/* ── The add-on menu: a flip-through booklet ──
+   The three tour pages are real, stacked, readable markup. With JS and motion
+   allowed, StPageFlip turns them like a book: a front and back cover are injected,
+   the pages become a spread (or a single page on a narrow screen), and a drag on
+   the corner turns them. Without JS, or with reduced motion, the pages stay
+   stacked cards and the index is plain in-page jump links. */
 (function () {
-  const book = document.querySelector('.menu__book');
-  if (!book) return;
-  const index  = book.querySelector('.menu__index');
+  const book  = document.querySelector('.menu__book');
+  const mount = document.getElementById('addon-flip');
+  if (!book || !mount || !window.St || !St.PageFlip) return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // A flip page is a fixed box; below ~480px it is too narrow to hold a tour's
+  // four add-ons without cramped internal scrolling, so phones keep the readable
+  // stacked cards and the flipbook runs on tablet/desktop where a page is roomy.
+  if (innerWidth < 480) return;
+
   const tabs   = Array.from(book.querySelectorAll('.menu__tab'));
-  const sheets = Array.from(book.querySelectorAll('.menu__sheet'));
-  const stage  = book.querySelector('.menu__stage');
+  const sheets = Array.from(mount.querySelectorAll('.menu__sheet'));
   const pager  = book.querySelector('.menu__pager');
   const prev   = book.querySelector('.menu__prev');
   const next   = book.querySelector('.menu__next');
-  if (!index || !stage || tabs.length === 0 || tabs.length !== sheets.length) return;
+  if (!tabs.length || !sheets.length) return;
 
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const OFFSET = 14;
+  // covers are decoration the no-JS fallback skips, so they are built here
+  const cover = document.createElement('article');
+  cover.className = 'page menu__cover';
+  cover.setAttribute('aria-label', 'Add-ons — front cover');
+  cover.innerHTML =
+    '<p class="mk">Unscripted Travel</p>' +
+    '<h3>Add-ons</h3>' +
+    '<hr class="rule">' +
+    '<div class="cover__foot"><p class="hint">Drag a corner to turn &rsaquo;</p></div>';
+  const back = document.createElement('article');
+  back.className = 'page menu__cover';
+  back.setAttribute('aria-label', 'Back cover');
+  back.innerHTML =
+    '<div style="margin:auto 0">' +
+    '<p class="mk">Unscripted Travel</p>' +
+    '<h3>Tell us what you like</h3><hr class="rule">' +
+    '<p class="hint" style="margin-top:1.3rem"><a href="#enquire">Start an enquiry &rsaquo;</a></p></div>';
+  mount.insertBefore(cover, sheets[0]);
+  mount.appendChild(back);
 
-  index.setAttribute('role', 'tablist');
-  index.setAttribute('aria-label', 'Journeys');
-  tabs.forEach((tab, i) => {
-    const panel = sheets[i];
-    if (!tab.id)   tab.id   = 'menu-tab-' + i;
-    if (!panel.id) panel.id = 'menu-sheet-' + i;
-    tab.setAttribute('role', 'tab');
-    tab.setAttribute('aria-controls', panel.id);
-    panel.setAttribute('role', 'tabpanel');
-    panel.setAttribute('aria-labelledby', tab.id);
-    panel.setAttribute('tabindex', '0');
+  const pages = Array.from(mount.querySelectorAll('.page'));  // [cover, city, wider, whole, back]
+  const TOUR0 = 1;                       // first tour sits at page index 1 (after the cover)
+  const lastPage = pages.length - 1;
+  mount.classList.add('menu__flip--live');
+
+  // open on a deep-linked tour if the hash names one, else on the closed cover
+  const hashTour = sheets.findIndex(s => '#' + s.id === location.hash);
+  const startPage = hashTour >= 0 ? hashTour + TOUR0 : 0;
+
+  const pf = new St.PageFlip(mount, {
+    width: 400, height: 600, size: 'stretch',
+    minWidth: 280, maxWidth: 440, minHeight: 420, maxHeight: 660,
+    maxShadowOpacity: 0.4, drawShadow: true, showCover: true,
+    usePortrait: true, mobileScrollSupport: true, showPageCorners: true,
+    swipeDistance: 30, flippingTime: 800, startPage: startPage
   });
+  pf.loadFromHTML(pages);
+
+  // the book is a group; a polite live region names each turn for a screen reader
+  mount.setAttribute('role', 'group');
+  mount.setAttribute('aria-roledescription', 'Flip-through booklet');
+  mount.setAttribute('aria-label', 'Add-ons by journey');
+  mount.tabIndex = 0;
+  const sr = document.createElement('p');
+  sr.className = 'menu__sr'; sr.setAttribute('aria-live', 'polite');
+  book.appendChild(sr);
+
+  tabs.forEach((t, i) => t.setAttribute('aria-controls', sheets[i].id));
   if (pager) pager.hidden = false;
 
-  let current = sheets.findIndex(s => s.classList.contains('is-active'));
-  if (current < 0) current = 0;
-  const hashIdx = sheets.findIndex(s => '#' + s.id === location.hash);
-  if (hashIdx >= 0) current = hashIdx;
-
-  function place(sheet, x) {          // snap to an offset with no transition (FLIP)
-    sheet.style.transition = 'none';
-    sheet.style.setProperty('--x', x + 'px');
-    void sheet.offsetWidth;           // commit the snap
-    sheet.style.transition = '';      // hand animation back to the CSS rule
-  }
-
-  function render(to, dir, moveFocus, writeHash) {
-    to = (to + sheets.length) % sheets.length;
-    const from = current;
-    tabs.forEach((t, i) => {
-      const sel = i === to;
-      t.setAttribute('aria-selected', sel ? 'true' : 'false');
-      t.tabIndex = sel ? 0 : -1;
-    });
-    if (from !== to && dir && !reduce) {
-      place(sheets[to], dir * OFFSET);
-      sheets[to].classList.add('is-active');            // slides in from `dir`
-      sheets[from].style.setProperty('--x', (-dir * OFFSET) + 'px');
-      sheets[from].classList.remove('is-active');       // slides out the far side
+  function sync(idx) {
+    const tour = idx - TOUR0;                 // -1 when a cover is showing
+    tabs.forEach((t, i) => { if (i === tour) t.setAttribute('aria-current', 'page'); else t.removeAttribute('aria-current'); });
+    // move focus off a control before it is disabled, or focus drops to <body>
+    const held = document.activeElement;
+    if (prev) prev.disabled = idx <= 0;
+    if (next) next.disabled = idx >= lastPage;
+    if (held === prev && prev.disabled) (next && !next.disabled ? next : mount).focus();
+    else if (held === next && next.disabled) (prev && !prev.disabled ? prev : mount).focus();
+    if (tour >= 0) {
+      history.replaceState(null, '', '#' + sheets[tour].id);
+      const name = sheets[tour].querySelector('.menu__tour');
+      sr.textContent = 'Tour ' + (tour + 1) + ' of ' + sheets.length + ': ' + (name ? name.textContent : '');
     } else {
-      sheets.forEach((sh, i) => sh.classList.toggle('is-active', i === to));
+      sr.textContent = idx === 0 ? 'Front cover' : 'Back cover';
     }
-    current = to;
-    // disabling the control that holds focus drops focus to <body> and strands
-    // the keyboard user at the top of the page, so move focus off it first
-    const hadFocus = document.activeElement;
-    if (prev) prev.disabled = to === 0;
-    if (next) next.disabled = to === sheets.length - 1;
-    if (hadFocus === prev && prev.disabled) (next && !next.disabled ? next : tabs[to]).focus();
-    else if (hadFocus === next && next.disabled) (prev && !prev.disabled ? prev : tabs[to]).focus();
-    if (writeHash) history.replaceState(null, '', '#' + sheets[to].id);
-    if (moveFocus) tabs[to].focus();
   }
+  pf.on('flip', (e) => sync(e.data));
+  sync(pf.getCurrentPageIndex());
 
-  render(current, 0, false, false);   // initial paint, no animation, no hash write
+  tabs.forEach((t, i) => t.addEventListener('click', (e) => { e.preventDefault(); pf.flip(i + TOUR0); }));
+  if (prev) prev.addEventListener('click', () => { if (pf.getCurrentPageIndex() > 0) pf.flipPrev(); });
+  if (next) next.addEventListener('click', () => { if (pf.getCurrentPageIndex() < lastPage) pf.flipNext(); });
 
-  tabs.forEach((tab, i) => {
-    tab.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (i !== current) render(i, i > current ? 1 : -1, false, true);
-    });
-    tab.addEventListener('keydown', (e) => {
-      // dir follows the key, not n>current — on a wrap the modulo crosses the
-      // whole range and n>current would invert the slide
-      let n = null, dir = 1;
-      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { n = (current + 1) % tabs.length; dir = 1; }
-      else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { n = (current - 1 + tabs.length) % tabs.length; dir = -1; }
-      else if (e.key === 'Home') { n = 0; dir = -1; }
-      else if (e.key === 'End') { n = tabs.length - 1; dir = 1; }
-      else return;
-      e.preventDefault();
-      render(n, dir, true, true);
-    });
+  mount.addEventListener('keydown', (e) => {
+    const cur = pf.getCurrentPageIndex();
+    let acted = false;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown') { if (cur < lastPage) { e.preventDefault(); acted = true; pf.flipNext(); } }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { if (cur > 0) { e.preventDefault(); acted = true; pf.flipPrev(); } }
+    else if (e.key === 'Home') { e.preventDefault(); acted = true; pf.flip(0); }
+    else if (e.key === 'End') { e.preventDefault(); acted = true; pf.flip(lastPage); }
+    // the turning page is set display:none; if focus lives inside it (the back
+    // cover's link is the only such target) it would drop to <body>, so pull it
+    // to the mount first — the mount is focusable and stays put through the turn
+    if (acted && document.activeElement !== mount && mount.contains(document.activeElement)) mount.focus();
   });
-
-  if (prev) prev.addEventListener('click', () => { if (current > 0) render(current - 1, -1, false, true); });
-  if (next) next.addEventListener('click', () => { if (current < sheets.length - 1) render(current + 1, 1, false, true); });
-
-  /* swipe to turn on touch; touch-action:pan-y keeps vertical scroll ours-free */
-  let sx = 0, sy = 0, tracking = false;
-  stage.addEventListener('pointerdown', (e) => {
-    if (e.pointerType === 'mouse') return;
-    sx = e.clientX; sy = e.clientY; tracking = true;
-  });
-  stage.addEventListener('pointerup', (e) => {
-    if (!tracking) return; tracking = false;
-    const dx = e.clientX - sx, dy = e.clientY - sy;
-    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.5) {
-      if (dx < 0 && current < sheets.length - 1) render(current + 1, 1, false, true);
-      else if (dx > 0 && current > 0) render(current - 1, -1, false, true);
-    }
-  });
-  stage.addEventListener('pointercancel', () => { tracking = false; });
 })();
 
 /* Enquiry form */
