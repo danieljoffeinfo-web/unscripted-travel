@@ -109,3 +109,29 @@ To swap in a different alternate cover, point `ALT` at the new photograph and se
 Type is **Jost** — the closest free match to the Futura-lineage foil lettering on the cover, in the same two weights (300 light / 500 medium) at wide tracking.
 
 Palette is sampled directly from the artwork. **Gold is foil only** — rules and hairlines. Never a button fill, never body text: it does not carry enough contrast on cream to be readable.
+
+That rule is now enforced rather than merely stated. Three places had drifted into gold text and all three failed AA: the step indices (2.66:1 on cream), the journey lengths (2.41:1 on the band) and the footer tagline (3.78:1 on the footer's ground). In each case the gold moved to the hairline next to the text — the step's top rule, the journey row's hover rule, the footer's divider — and the text took a readable colour.
+
+### The metadata voice
+
+Labels, section indices, plate coordinates and the footer colophon are set in a
+monospace at wide tracking, separate from Jost. Kobu — the reference the nav was
+already built from — runs its captions this way, and the crafted feel comes from
+the change of register rather than from a lighter colour.
+
+That matters for contrast. Making metadata quieter by fading it is what produced
+the failures above, so hierarchy here comes from family, size and tracking
+instead, and every label clears AA on every ground it appears on: cream 5.14:1,
+the recessed band 4.66:1, the enquiry panel 5.00:1, the footer 4.64:1.
+
+The coordinates are real. Table Mountain is 33°57′S 18°24′E, Cape Point is
+34°21′S 18°29′E, and so on down the plates. They are the one thing on the page a
+stock-photo competitor cannot copy, and they carry Cape Town without a single
+decorative graphic — which the reference explicitly warns against.
+
+### Crop marks
+
+The image slots carry registration ticks at two diagonal corners, set clear of
+the trim edge. The brand is a printed object — the masthead is a photograph of
+one — so the slots are marked up the way artwork for print is. They sit outside
+the plate border, so they survive a real photograph landing in the slot.

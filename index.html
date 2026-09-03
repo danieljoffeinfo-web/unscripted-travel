@@ -28,7 +28,7 @@
 :root{
   --ink:#2A2E26;
   --ink-soft:#5F6557;
-  --ink-faint:#666B5E;   /* 4.7:1 on cream */
+  --ink-faint:#606558;   /* 5.1:1 on cream, 4.7:1 on the band */
   --cream:#F2EDE3;      /* the page */
   --cream-2:#E9E2D4;    /* the one recessed band */
   --kraft:#BC9C70;      /* the photographed sheet, flattened to one tone */
@@ -46,6 +46,11 @@
 
   --track-wide:.34em;
   --track-title:.16em;
+
+  /* A second voice for metadata only — labels, indices, coordinates. Kobu runs
+     its captions in a monospace at wide tracking; the crafted feel comes from
+     the change of register, not from a lighter colour. */
+  --mono:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,'Liberation Mono',monospace;
 }
 
 html{ -webkit-text-size-adjust:100%; scroll-behavior:smooth; }
@@ -90,6 +95,17 @@ img{ max-width:100%; display:block; }
   font-size:clamp(1.02rem,.98rem + .3vw,1.16rem);
   text-wrap:pretty;
 }
+/* ── Metadata: section indices, plate coordinates, the footer's fix.
+      mono's rule — hierarchy through family, size and tracking rather than
+      colour — so these stay quiet while still clearing AA on every ground. ── */
+.idx,.coord,.meta{
+  font-family:var(--mono); font-variant-numeric:tabular-nums;
+  text-transform:uppercase; color:var(--meta-c,var(--ink-faint));
+}
+.eyebrow:has(.idx){ display:flex; justify-content:space-between; align-items:baseline; gap:24px; }
+.idx{ font-size:.62rem; letter-spacing:.14em; white-space:nowrap; }
+.coord{ font-size:.58rem; letter-spacing:.08em; white-space:nowrap; }
+
 .section{ padding-block:var(--section); }
 .head--center{ text-align:center; }
 .head--center .lede{ margin-inline:auto; }
@@ -226,8 +242,19 @@ figure{ margin:0; }
 .plate{
   position:relative; width:100%; background:var(--cream-2);
   border:1px solid rgba(176,141,79,.32);
-  display:grid; place-items:center; overflow:hidden;
+  display:grid; place-items:center;
 }
+/* Registration ticks. The brand IS a printed object — the masthead is a
+   photograph of one — so the image slots carry crop marks. Gold stays a
+   hairline here, never a fill. They sit outside the border so they survive a
+   real photograph landing in the slot. */
+.plate::before,.plate::after{
+  content:''; position:absolute; width:9px; height:9px;
+  border:1px solid var(--gold); opacity:.55; pointer-events:none;
+}
+/* clear of the trim edge, the way a crop mark actually sits */
+.plate::before{ top:-12px; left:-12px; border-right:0; border-bottom:0; }
+.plate::after{ bottom:-12px; right:-12px; border-left:0; border-top:0; }
 .plate img{ width:100%; height:100%; object-fit:cover; }
 .plate__fpo{
   font-weight:500; font-size:.58rem; letter-spacing:.3em; text-transform:uppercase;
@@ -238,6 +265,7 @@ figure{ margin:0; }
   opacity:.5; margin:0 auto .9rem;
 }
 figcaption{ margin-top:10px; /* MANNA */ }
+.capline{ display:flex; justify-content:space-between; align-items:baseline; gap:16px; }
 figcaption .name{ display:block; }
 figcaption .note{ display:block; margin-top:3px; }
 /* only the wide lead plate has room for a single-line caption */
@@ -245,6 +273,7 @@ figcaption .note{ display:block; margin-top:3px; }
   .plates > figure:first-child figcaption{
     display:flex; justify-content:space-between; align-items:baseline; gap:24px;
   }
+  .plates > figure:first-child .capline{ flex:0 0 auto; gap:22px; }
   .plates > figure:first-child figcaption .note{ margin-top:0; }
 }
 figcaption .name{
@@ -269,8 +298,9 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
 .step{ border-top:1px solid rgba(176,141,79,.4); padding-top:22px; counter-increment:s; }
 .step::before{
   content:counter(s,decimal-leading-zero);
-  display:block; font-weight:500; font-size:.68rem; letter-spacing:.28em;
-  color:var(--gold); margin-bottom:1rem;
+  display:block; font-family:var(--mono); font-size:.68rem; letter-spacing:.2em;
+  color:var(--ink-faint); margin-bottom:1rem;
+  /* was gold: 2.66:1 on cream. The gold stays on this step's top hairline. */
 }
 .step h3{
   margin:0 0 .7rem; font-weight:500; font-size:.82rem;
@@ -285,11 +315,19 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
   display:grid; gap:8px 40px; align-items:baseline;
   grid-template-columns:1fr; padding:clamp(26px,3.4vw,40px) 0;
   border-bottom:1px solid rgba(42,46,38,.14);
+  position:relative;
 }
+/* the foil rule draws itself across the row under the pointer */
+.journey::after{
+  content:''; position:absolute; left:0; bottom:-1px; width:0; height:1px;
+  background:var(--gold); transition:width .55s cubic-bezier(.22,.61,.36,1);
+}
+.journey:hover::after,.journey:focus-within::after{ width:100%; }
 @media (min-width:820px){ .journey{ grid-template-columns:190px 1fr auto; } }
 .journey__len{
-  font-weight:500; font-size:.68rem; letter-spacing:.26em; text-transform:uppercase;
-  color:var(--gold); white-space:nowrap;
+  font-family:var(--mono); font-size:.66rem; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--ink-faint); white-space:nowrap;
+  /* was gold: 2.41:1 on this band. Gold moves to the row's hover hairline. */
 }
 .journey__name{
   font-weight:300; text-transform:uppercase; letter-spacing:var(--track-title);
@@ -321,6 +359,7 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
 
 /* ── Enquiry ── */
 .enquire{ background:var(--cover); color:var(--cream); }
+.enquire{ --meta-c:rgba(242,237,227,.70); }   /* 5.00:1 on the cover ground */
 .enquire .eyebrow{ color:var(--gold-lit); }
 .enquire .title{ color:var(--sage-lit); }
 .enquire .lede{ color:rgba(242,237,227,.72); }
@@ -364,7 +403,11 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
 .form__status{ margin:20px 0 0; font-size:.9rem; min-height:1.4em; color:var(--gold-lit); }
 
 /* ── Footer — the book closes ── */
-.footer{ background:var(--cover-lit); color:var(--cream); padding-block:clamp(48px,6vw,72px); }
+.footer{
+  background:var(--cover-lit); color:var(--cream);
+  padding-block:clamp(48px,6vw,72px);
+  --meta-c:rgba(242,237,227,.82);   /* 4.64:1 on this ground */
+}
 .footer__top{
   display:grid; gap:clamp(28px,4vw,48px); grid-template-columns:1fr;
   padding-bottom:clamp(30px,4vw,44px); border-bottom:1px solid rgba(216,188,124,.3);
@@ -376,11 +419,12 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
 }
 .footer__tag{
   margin:.9rem 0 0; font-weight:500; font-size:.62rem;
-  letter-spacing:.28em; text-transform:uppercase; color:var(--gold-lit);
+  letter-spacing:.28em; text-transform:uppercase;
+  color:rgba(242,237,227,.82);   /* was gold-lit: 3.78:1 on cover-lit */
 }
 .footer h4{
   margin:0 0 1rem; font-weight:500; font-size:.62rem;
-  letter-spacing:.28em; text-transform:uppercase; color:rgba(242,237,227,.55);
+  letter-spacing:.28em; text-transform:uppercase; color:rgba(242,237,227,.80);
 }
 .footer ul{ list-style:none; margin:0; padding:0; }
 .footer li{ margin-bottom:.6rem; }
@@ -392,8 +436,9 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
 .footer__base{
   display:flex; flex-wrap:wrap; gap:12px 28px; justify-content:space-between;
   padding-top:clamp(24px,3vw,32px);
-  font-size:.72rem; letter-spacing:.12em; text-transform:uppercase;
-  color:rgba(242,237,227,.5);
+  font-family:var(--mono); font-variant-numeric:tabular-nums;
+  font-size:.68rem; letter-spacing:.1em; text-transform:uppercase;
+  color:rgba(242,237,227,.82);   /* was .5: 2.77:1 */
 }
 
 :where(a,button,input,select,textarea):focus-visible{
@@ -404,8 +449,16 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
       Scoped to .js so the page still renders if JavaScript never runs. ── */
 .js .reveal{ opacity:0; transform:translate3d(0,16px,0); }
 .js .reveal.is-in{ opacity:1; transform:none; transition:opacity .7s ease,transform .7s ease; }
+/* the lockup's gold rule draws itself rather than fading in with the block */
+.js .reveal .rule{ transform:scaleX(0); transform-origin:left center; }
+.js .reveal .rule.center{ transform-origin:center; }
+.js .reveal.is-in .rule{
+  transform:scaleX(1); transition:transform .9s cubic-bezier(.22,.61,.36,1) .12s;
+}
 @media (prefers-reduced-motion:reduce){
   .js .reveal,.js .reveal.is-in{ opacity:1; transform:none; transition:none; }
+  .js .reveal .rule,.js .reveal.is-in .rule{ transform:none; transition:none; }
+  .journey::after{ transition:none; }
 }
 </style>
 </head>
@@ -448,7 +501,7 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
   <!-- Manifesto -->
   <section class="section manifesto">
     <div class="wrap manifesto__grid">
-      <div>
+      <div class="reveal">
         <p class="statement">No fixed itineraries</p>
         <hr class="rule">
       </div>
@@ -464,7 +517,7 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
   <section class="section" id="experiences">
     <div class="wrap">
       <div class="reveal">
-        <p class="eyebrow">What the days are made of</p>
+        <p class="eyebrow">What the days are made of<span class="idx">01 / 04</span></p>
         <h2 class="title">Experiences</h2>
         <hr class="rule">
         <p class="lede">A shortlist, not a menu. Every trip is assembled from scratch — these are simply the things Cape Town does better than anywhere else.</p>
@@ -473,31 +526,31 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
       <div class="plates">
         <figure class="reveal">
           <div class="plate"><p class="plate__fpo">Table Mountain<br>16:9 · landscape</p></div>
-          <figcaption><span class="name">Table Mountain</span><span class="note">Up the back path, before the cable car opens.</span></figcaption>
+          <figcaption><span class="capline"><span class="name">Table Mountain</span><span class="coord">33&deg;57&prime;S 18&deg;24&prime;E</span></span><span class="note">Up the back path, before the cable car opens.</span></figcaption>
         </figure>
         <figure class="reveal">
           <div class="plate"><p class="plate__fpo">The Winelands<br>4:5 · portrait</p></div>
-          <figcaption><span class="name">The Winelands</span><span class="note">Franschhoek, Stellenbosch.</span></figcaption>
+          <figcaption><span class="capline"><span class="name">The Winelands</span><span class="coord">33&deg;54&prime;S 19&deg;07&prime;E</span></span><span class="note">Franschhoek, Stellenbosch.</span></figcaption>
         </figure>
         <figure class="reveal">
           <div class="plate"><p class="plate__fpo">Cape Peninsula<br>4:5 · portrait</p></div>
-          <figcaption><span class="name">The Peninsula</span><span class="note">Chapman's Peak to Cape Point.</span></figcaption>
+          <figcaption><span class="capline"><span class="name">The Peninsula</span><span class="coord">34&deg;21&prime;S 18&deg;29&prime;E</span></span><span class="note">Chapman's Peak to Cape Point.</span></figcaption>
         </figure>
         <figure class="reveal">
           <div class="plate"><p class="plate__fpo">Bo-Kaap<br>4:5 · portrait</p></div>
-          <figcaption><span class="name">Bo-Kaap</span><span class="note">On foot, with someone who lives there.</span></figcaption>
+          <figcaption><span class="capline"><span class="name">Bo-Kaap</span><span class="coord">33&deg;55&prime;S 18&deg;25&prime;E</span></span><span class="note">On foot, with someone who lives there.</span></figcaption>
         </figure>
         <figure class="reveal">
           <div class="plate"><p class="plate__fpo">Simon's Town<br>4:5 · portrait</p></div>
-          <figcaption><span class="name">Simon's Town</span><span class="note">Boulders, and the road that gets you there.</span></figcaption>
+          <figcaption><span class="capline"><span class="name">Simon's Town</span><span class="coord">34&deg;12&prime;S 18&deg;26&prime;E</span></span><span class="note">Boulders, and the road that gets you there.</span></figcaption>
         </figure>
         <figure class="reveal">
           <div class="plate"><p class="plate__fpo">Kirstenbosch<br>4:5 · portrait</p></div>
-          <figcaption><span class="name">Kirstenbosch</span><span class="note">Late afternoon, under the eastern slope.</span></figcaption>
+          <figcaption><span class="capline"><span class="name">Kirstenbosch</span><span class="coord">33&deg;59&prime;S 18&deg;26&prime;E</span></span><span class="note">Late afternoon, under the eastern slope.</span></figcaption>
         </figure>
         <figure class="reveal">
           <div class="plate"><p class="plate__fpo">Atlantic Seaboard<br>4:5 · portrait</p></div>
-          <figcaption><span class="name">The Seaboard</span><span class="note">Clifton and Camps Bay, timed for the light.</span></figcaption>
+          <figcaption><span class="capline"><span class="name">The Seaboard</span><span class="coord">33&deg;57&prime;S 18&deg;23&prime;E</span></span><span class="note">Clifton and Camps Bay, timed for the light.</span></figcaption>
         </figure>
       </div>
     </div>
@@ -507,7 +560,7 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
   <section class="section" id="how">
     <div class="wrap">
       <div class="reveal">
-        <p class="eyebrow">The process</p>
+        <p class="eyebrow">The process<span class="idx">02 / 04</span></p>
         <h2 class="title">How it works</h2>
         <hr class="rule">
       </div>
@@ -532,7 +585,7 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
   <section class="section journeys" id="journeys">
     <div class="wrap">
       <div class="reveal">
-        <p class="eyebrow">Starting points</p>
+        <p class="eyebrow">Starting points<span class="idx">03 / 04</span></p>
         <h2 class="title">Journeys</h2>
         <hr class="rule">
         <p class="lede">Three shapes people tend to start from. Each one gets rebuilt around you — treat them as a sense of pace, not a package.</p>
@@ -580,7 +633,7 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
   <section class="section enquire" id="enquire">
     <div class="wrap">
       <div class="reveal">
-        <p class="eyebrow">Start here</p>
+        <p class="eyebrow">Start here<span class="idx">04 / 04</span></p>
         <h2 class="title">Tell us what you like</h2>
         <hr class="rule">
         <p class="lede">No deposit, no obligation. We reply within one working day with a first idea of the shape your trip could take.</p>
@@ -652,7 +705,7 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
     </div>
     <div class="footer__base">
       <span>&copy; <span id="yr"></span> Unscripted Travel</span>
-      <span>Cape Town, South Africa</span>
+      <span>Cape Town, South Africa &middot; 33&deg;55&prime;S 18&deg;25&prime;E</span>
     </div>
   </div>
 </footer>
