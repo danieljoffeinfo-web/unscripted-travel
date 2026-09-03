@@ -389,7 +389,8 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
    printed sheet; the same trick the body uses, a touch stronger here. */
 .menu__sheet{
   background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23p)' opacity='.06'/%3E%3C/svg%3E") 0 0/160px 160px,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='pg'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.6' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23pg)' opacity='.11'/%3E%3C/svg%3E") 0 0/140px 140px,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='pm'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.02' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23pm)' opacity='.05'/%3E%3C/svg%3E") 0 0/300px 300px,
     var(--cream-2);
   box-sizing:border-box;
   padding:clamp(24px,3.2vw,40px) clamp(20px,3vw,40px);
@@ -405,7 +406,8 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
 /* the cover pages, injected by the script — decoration the fallback skips */
 .menu__cover{
   background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23c)' opacity='.05'/%3E%3C/svg%3E") 0 0/160px 160px,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='cg'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.6' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23cg)' opacity='.08'/%3E%3C/svg%3E") 0 0/140px 140px,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='cm'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.02' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23cm)' opacity='.05'/%3E%3C/svg%3E") 0 0/300px 300px,
     var(--cover);
   color:var(--cream); box-sizing:border-box; height:100%;
   display:flex; flex-direction:column; padding:clamp(30px,4vw,52px);
@@ -450,6 +452,21 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
 .menu__next{ --sx:3px; }
 .menu__sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap; }
 
+/* On a phone the flip page is a fixed box, so give it more room (wider column,
+   less gutter) and tighten the type/spacing so all four add-ons fit without the
+   page needing to scroll inside itself. */
+@media (max-width:560px){
+  .section.menu > .wrap{ padding-inline:14px; }
+  .menu__book{ max-width:none; }
+  .menu__flip--live .menu__sheet{ padding:22px 20px; }
+  .menu__flip--live .menu__tour{ font-size:1.15rem; }
+  .menu__flip--live .menu__head{ padding-bottom:2px; }
+  .menu__flip--live .menu__rows{ margin-top:10px; }
+  .menu__flip--live .menu__row{ padding:9px 0; gap:12px 18px; }
+  .menu__flip--live .menu__name{ font-size:.76rem; line-height:1.25; }
+  .menu__flip--live .menu__note{ font-size:.84rem; line-height:1.35; margin-top:3px; }
+  .menu__flip--live .menu__price{ font-size:.86rem; }
+}
 @media (prefers-reduced-motion:reduce){ .menu__arrow{ transition:none; } }
 
 /* ── Words (client supplies the real quote) ── */
@@ -1092,10 +1109,11 @@ document.querySelectorAll('.reveal').forEach((el, i) => {
   const mount = document.getElementById('addon-flip');
   if (!book || !mount || !window.St || !St.PageFlip) return;
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  // A flip page is a fixed box; below ~480px it is too narrow to hold a tour's
-  // four add-ons without cramped internal scrolling, so phones keep the readable
-  // stacked cards and the flipbook runs on tablet/desktop where a page is roomy.
-  if (innerWidth < 480) return;
+  // Very small screens can't hold a tour's four add-ons on a fixed page even
+  // when tuned; those keep the readable stacked cards. Everything from a normal
+  // phone up gets the flipbook, sized taller on narrow screens (below).
+  if (innerWidth < 340) return;
+  const narrow = innerWidth < 560;
 
   const tabs   = Array.from(book.querySelectorAll('.menu__tab'));
   const sheets = Array.from(mount.querySelectorAll('.menu__sheet'));
@@ -1134,8 +1152,10 @@ document.querySelectorAll('.reveal').forEach((el, i) => {
   const startPage = hashTour >= 0 ? hashTour + TOUR0 : 0;
 
   const pf = new St.PageFlip(mount, {
-    width: 400, height: 600, size: 'stretch',
-    minWidth: 280, maxWidth: 440, minHeight: 420, maxHeight: 660,
+    // narrow screens use a taller page so four add-ons fit the fixed box
+    width: narrow ? 360 : 400, height: narrow ? 668 : 600, size: 'stretch',
+    minWidth: narrow ? 300 : 280, maxWidth: narrow ? 520 : 440,
+    minHeight: narrow ? 556 : 420, maxHeight: narrow ? 960 : 660,
     maxShadowOpacity: 0.4, drawShadow: true, showCover: false,
     usePortrait: true, mobileScrollSupport: true, showPageCorners: true,
     swipeDistance: 30, flippingTime: 800, startPage: startPage
