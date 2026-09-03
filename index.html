@@ -384,9 +384,14 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
 .menu__flip:focus-visible{ outline:2px solid var(--gold); outline-offset:8px; }
 .menu__flip--live .stf__item{ box-shadow:0 6px 24px rgba(42,46,38,.14); }
 
-/* a page — a bordered card when stacked (no JS / reduced motion), a book page when live */
+/* a page — a bordered card when stacked (no JS / reduced motion), a book page
+   when live. A fine fractal-noise grain over the cream gives it the tooth of a
+   printed sheet; the same trick the body uses, a touch stronger here. */
 .menu__sheet{
-  background:var(--cream-2); box-sizing:border-box;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23p)' opacity='.06'/%3E%3C/svg%3E") 0 0/160px 160px,
+    var(--cream-2);
+  box-sizing:border-box;
   padding:clamp(24px,3.2vw,40px) clamp(20px,3vw,40px);
   border:1px solid rgba(176,141,79,.32); scroll-margin-top:24px;
 }
@@ -399,7 +404,10 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
 
 /* the cover pages, injected by the script — decoration the fallback skips */
 .menu__cover{
-  background:var(--cover); color:var(--cream); box-sizing:border-box; height:100%;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23c)' opacity='.05'/%3E%3C/svg%3E") 0 0/160px 160px,
+    var(--cover);
+  color:var(--cream); box-sizing:border-box; height:100%;
   display:flex; flex-direction:column; padding:clamp(30px,4vw,52px);
   border:1px solid rgba(216,188,124,.3);
 }
@@ -1128,7 +1136,7 @@ document.querySelectorAll('.reveal').forEach((el, i) => {
   const pf = new St.PageFlip(mount, {
     width: 400, height: 600, size: 'stretch',
     minWidth: 280, maxWidth: 440, minHeight: 420, maxHeight: 660,
-    maxShadowOpacity: 0.4, drawShadow: true, showCover: true,
+    maxShadowOpacity: 0.4, drawShadow: true, showCover: false,
     usePortrait: true, mobileScrollSupport: true, showPageCorners: true,
     swipeDistance: 30, flippingTime: 800, startPage: startPage
   });
@@ -1163,15 +1171,23 @@ document.querySelectorAll('.reveal').forEach((el, i) => {
       sr.textContent = idx === 0 ? 'Front cover' : 'Back cover';
     }
   }
-  pf.on('flip', (e) => sync(e.data));
-  sync(pf.getCurrentPageIndex());
+  // Track the current page ourselves from the authoritative 'flip' event.
+  // pf.getCurrentPageIndex() lags a step and returns a stale value right after
+  // init, which made the guards below block backward flips (and disable Prev on
+  // the very page you needed it) — the bug behind "the page won't flip back".
+  let cur = startPage;
+  pf.on('flip', (e) => { cur = e.data; sync(e.data); });
+  sync(startPage);
 
   tabs.forEach((t, i) => t.addEventListener('click', (e) => { e.preventDefault(); pf.flip(i + TOUR0); }));
-  if (prev) prev.addEventListener('click', () => { if (pf.getCurrentPageIndex() > 0) pf.flipPrev(); });
-  if (next) next.addEventListener('click', () => { if (pf.getCurrentPageIndex() < lastPage) pf.flipNext(); });
+  // No cur guard here — the buttons are disabled at the ends by sync() (driven by
+  // the reliable flip event), and a stray flip past an end is a harmless no-op.
+  // Guarding on a tracked index risked blocking a valid turn, which is exactly
+  // how backward navigation broke before.
+  if (prev) prev.addEventListener('click', () => pf.flipPrev());
+  if (next) next.addEventListener('click', () => pf.flipNext());
 
   mount.addEventListener('keydown', (e) => {
-    const cur = pf.getCurrentPageIndex();
     let acted = false;
     if (e.key === 'ArrowRight' || e.key === 'PageDown') { if (cur < lastPage) { e.preventDefault(); acted = true; pf.flipNext(); } }
     else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { if (cur > 0) { e.preventDefault(); acted = true; pf.flipPrev(); } }
