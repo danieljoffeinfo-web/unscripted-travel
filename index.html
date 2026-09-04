@@ -1118,6 +1118,11 @@ document.querySelectorAll('.reveal').forEach((el, i) => {
   const next   = book.querySelector('.menu__next');
   if (!tabs.length || !sheets.length) return;
 
+  // snapshot the pristine tour pages before StPageFlip touches them, so the
+  // self-heal below can rebuild a clean stacked menu no matter what state the
+  // flip left the DOM in.
+  const pristine = mount.innerHTML;
+
   // covers are decoration the no-JS fallback skips, so they are built here
   const cover = document.createElement('article');
   cover.className = 'page menu__cover';
@@ -1224,6 +1229,30 @@ document.querySelectorAll('.reveal').forEach((el, i) => {
     // to the mount first — the mount is focusable and stays put through the turn
     if (acted && document.activeElement !== mount && mount.contains(document.activeElement)) mount.focus();
   });
+
+  // Self-heal: if this browser renders the book as a two-page spread anyway
+  // (exactly one page should be visible in portrait), tear the flipbook down and
+  // fall back to the always-correct stacked cards. Guarantees a broken spread is
+  // never shown, whatever the browser does with the flip.
+  function fallbackToStacked() {
+    // Stop the flip, wipe every StPageFlip artifact (mount, wrappers, and any
+    // hard-page clones it appended), and rebuild clean stacked cards from the
+    // pristine snapshot — identical to the no-JS view, with no leftover state.
+    try { pf.destroy(); } catch (e) {}
+    if (sr) sr.remove();
+    book.querySelectorAll('.menu__flip, .stf__parent, .stf__wrapper, .stf__block, .stf__item').forEach((e) => e.remove());
+    const wrap = document.createElement('div');
+    wrap.className = 'menu__flip';
+    wrap.innerHTML = pristine;
+    book.insertBefore(wrap, pager || null);
+    if (pager) pager.hidden = true;
+    tabs.forEach((t) => t.removeAttribute('aria-current'));
+  }
+  requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(() => {
+    const visible = Array.from(mount.querySelectorAll('.stf__item'))
+      .filter((x) => getComputedStyle(x).display !== 'none').length;
+    if (visible !== 1) fallbackToStacked();
+  }, 60)));
 })();
 
 /* Enquiry form */
