@@ -382,11 +382,37 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
 }
 .menu__sheet + .menu__sheet{ margin-top:clamp(24px,3.2vw,40px); }
 
-/* live: the stage carries perspective; one card flips, the others are removed */
-.menu__stage--live{ perspective:1800px; }
-.menu__stage--live .menu__sheet{ margin:0; backface-visibility:hidden; transform-origin:center; }
+/* live: one card at rest, turned on its spine like a real page. Cards overlap
+   (absolute) so the incoming page shows beneath the outgoing one during a turn;
+   only one is ever visible at rest, so there is still no two-page spread. The
+   stage height is set by the script to the tallest card. */
+.menu__stage--live{ position:relative; perspective:2200px; }
+.menu__stage--live .menu__sheet{
+  position:absolute; top:0; left:0; width:100%; height:100%; margin:0;
+  overflow:hidden; backface-visibility:hidden; transform-origin:left center;
+  will-change:transform;
+}
 .menu__stage--live .menu__sheet[hidden]{ display:none; }
 .menu__stage:focus-visible{ outline:2px solid var(--gold); outline-offset:8px; }
+/* a soft shadow sweeps across the page as it turns */
+.menu__sheet__shade{
+  position:absolute; inset:0; pointer-events:none; opacity:0;
+  background:linear-gradient(105deg, rgba(42,46,38,0) 55%, rgba(42,46,38,.22) 100%);
+}
+
+/* the front cover — the closed booklet, in the site's own green */
+.menu__cover{
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='cg'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.6' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23cg)' opacity='.08'/%3E%3C/svg%3E") 0 0/140px 140px,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='cm'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.02' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23cm)' opacity='.05'/%3E%3C/svg%3E") 0 0/300px 300px,
+    var(--cover);
+  color:var(--cream); border-color:rgba(216,188,124,.3);
+  display:flex; flex-direction:column; justify-content:center;
+}
+.menu__cover .mk{ font-weight:500; font-size:.76rem; letter-spacing:.3em; text-transform:uppercase; color:var(--gold-lit); margin:0; }
+.menu__cover h3{ font-weight:300; text-transform:uppercase; letter-spacing:.16em; font-size:clamp(1.6rem,1.2rem + 1.6vw,2.4rem); margin:1.1rem 0 0; color:var(--sage-lit); }
+.menu__cover .rule{ background:var(--gold-lit); margin-top:1.4rem; }
+.menu__cover .hint{ font-family:var(--mono); font-size:.6rem; letter-spacing:.12em; text-transform:uppercase; color:rgba(242,237,227,.74); margin:1.6rem 0 0; }
 
 .menu__head{ display:flex; justify-content:space-between; align-items:baseline; gap:20px; }
 .menu__len{ font-family:var(--mono); font-size:.66rem; letter-spacing:.18em; text-transform:uppercase; color:var(--ink-faint); margin:0 0 .5rem; }
@@ -1054,79 +1080,124 @@ document.querySelectorAll('.reveal').forEach((el, i) => {
   update();
 })();
 
-/* ── The add-on menu: one card you turn ──
+/* ── The add-on menu: a booklet you turn ──
    The three journeys are real, stacked, readable markup (works with no JS). Here
-   we show ONE card at a time and flip between them with a light 3D turn. Only one
-   card is ever in the DOM's flow, so there is no two-page spread for any browser
-   to get wrong. Reduced motion swaps instantly. */
+   a green front cover is added and it becomes one card at a time, turned on its
+   spine — the incoming page shows beneath the outgoing one as it turns over. Only
+   one card is ever visible at rest, so no browser renders a two-page spread.
+   Reduced motion swaps instantly. */
 (function () {
   const book  = document.querySelector('.menu__book');
   const stage = document.getElementById('addon-stage');
   if (!book || !stage) return;
-  const tabs   = Array.from(book.querySelectorAll('.menu__tab'));
-  const sheets = Array.from(stage.querySelectorAll('.menu__sheet'));
-  const pager  = book.querySelector('.menu__pager');
-  const prev   = book.querySelector('.menu__prev');
-  const next   = book.querySelector('.menu__next');
-  if (!sheets.length || tabs.length !== sheets.length) return;
+  const tabs  = Array.from(book.querySelectorAll('.menu__tab'));
+  const tours = Array.from(stage.querySelectorAll('.menu__sheet'));
+  const pager = book.querySelector('.menu__pager');
+  const prev  = book.querySelector('.menu__prev');
+  const next  = book.querySelector('.menu__next');
+  if (!tours.length || tabs.length !== tours.length) return;
 
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // green front cover, card 0 (decoration the no-JS view skips)
+  const cover = document.createElement('article');
+  cover.className = 'menu__sheet menu__cover';
+  cover.setAttribute('aria-label', 'Add-ons — cover');
+  cover.innerHTML =
+    '<p class="mk">Unscripted Travel</p>' +
+    '<h3>Add-ons</h3>' +
+    '<hr class="rule">' +
+    '<p class="hint">Turn the page &rsaquo;</p>';
+  stage.insertBefore(cover, tours[0]);
+
+  const cards = [cover].concat(tours);   // [cover, city, wider, whole]
+  const TOUR0 = 1;
+  cards.forEach((c) => { const sh = document.createElement('span'); sh.className = 'menu__sheet__shade'; c.appendChild(sh); });
+
   stage.classList.add('menu__stage--live');
   stage.setAttribute('role', 'group');
-  stage.setAttribute('aria-roledescription', 'Menu — one journey per card');
+  stage.setAttribute('aria-roledescription', 'Booklet — one page at a time');
   stage.setAttribute('aria-label', 'Add-ons by journey');
   stage.tabIndex = 0;
   const sr = document.createElement('p');
   sr.className = 'menu__sr'; sr.setAttribute('aria-live', 'polite');
   book.appendChild(sr);
-  tabs.forEach((t, i) => t.setAttribute('aria-controls', sheets[i].id));
+  tabs.forEach((t, i) => t.setAttribute('aria-controls', tours[i].id));
 
-  let cur = sheets.findIndex((sh) => '#' + sh.id === location.hash);
-  if (cur < 0) cur = 0;
-  sheets.forEach((sh, i) => { sh.hidden = i !== cur; });
+  let cur = 0;
+  const hashTour = tours.findIndex((s2) => '#' + s2.id === location.hash);
+  if (hashTour >= 0) cur = hashTour + TOUR0;
+
+  // size the stage to the tallest page (measured in normal flow, before overlap)
+  function sizeStage() {
+    cards.forEach((c) => { c.style.position = 'static'; c.style.height = 'auto'; c.hidden = false; });
+    let max = 0;
+    cards.forEach((c) => { max = Math.max(max, c.offsetHeight); });
+    cards.forEach((c, i) => { c.style.position = ''; c.style.height = ''; c.hidden = i !== cur; });
+    stage.style.height = max + 'px';
+  }
+  sizeStage();
   if (pager) pager.hidden = false;
 
   function paint() {
-    tabs.forEach((t, i) => { if (i === cur) t.setAttribute('aria-current', 'page'); else t.removeAttribute('aria-current'); });
-    // move focus off a control before it disables, so it never drops to <body>
+    const tourIdx = cur - TOUR0;
+    tabs.forEach((t, i) => { if (i === tourIdx) t.setAttribute('aria-current', 'page'); else t.removeAttribute('aria-current'); });
     const held = document.activeElement;
     if (prev) prev.disabled = cur === 0;
-    if (next) next.disabled = cur === sheets.length - 1;
+    if (next) next.disabled = cur === cards.length - 1;
     if (held === prev && prev.disabled) (next && !next.disabled ? next : stage).focus();
     else if (held === next && next.disabled) (prev && !prev.disabled ? prev : stage).focus();
-    const name = sheets[cur].querySelector('.menu__tour');
-    sr.textContent = 'Journey ' + (cur + 1) + ' of ' + sheets.length + (name ? ': ' + name.textContent : '');
+    if (tourIdx >= 0) {
+      const name = tours[tourIdx].querySelector('.menu__tour');
+      sr.textContent = 'Journey ' + (tourIdx + 1) + ' of ' + tours.length + (name ? ': ' + name.textContent : '');
+    } else {
+      sr.textContent = 'Front cover';
+    }
   }
   paint();
 
+  const DUR = 520;
   let busy = false;
   function goTo(n) {
-    n = Math.max(0, Math.min(sheets.length - 1, n));
+    n = Math.max(0, Math.min(cards.length - 1, n));
     if (n === cur || busy) return;
     const dir = n > cur ? 1 : -1;
-    const from = sheets[cur], to = sheets[n];
+    const from = cards[cur], to = cards[n];
     if (reduce) { from.hidden = true; to.hidden = false; cur = n; paint(); return; }
     busy = true;
-    from.style.transition = 'transform .2s ease-in, opacity .2s ease-in';
-    from.style.transform = 'rotateY(' + (dir * -90) + 'deg)';
-    from.style.opacity = '0';
-    setTimeout(() => {
-      from.hidden = true; from.style.cssText = '';
-      to.hidden = false;
-      to.style.transition = 'none';
-      to.style.transform = 'rotateY(' + (dir * 90) + 'deg)';
-      to.style.opacity = '0';
+    const fromShade = from.querySelector('.menu__sheet__shade');
+    const toShade = to.querySelector('.menu__sheet__shade');
+    const done = () => {
+      from.hidden = true; from.removeAttribute('style');
+      to.hidden = false; to.removeAttribute('style');
+      if (fromShade) fromShade.removeAttribute('style');
+      if (toShade) toShade.removeAttribute('style');
+      cur = n; busy = false; paint();
+    };
+    if (dir > 0) {
+      // forward: reveal `to` beneath; turn `from` up and over on the spine
+      to.hidden = false; to.style.zIndex = '1'; to.style.transform = 'rotateY(0deg)';
+      from.style.zIndex = '2'; from.style.transition = 'none'; from.style.transform = 'rotateY(0deg)';
+      void from.offsetWidth;
+      from.style.transition = 'transform ' + DUR + 'ms cubic-bezier(.4,0,.2,1)';
+      from.style.transform = 'rotateY(-180deg)';
+      if (fromShade) { fromShade.style.transition = 'opacity ' + (DUR * 0.6) + 'ms ease'; fromShade.style.opacity = '1'; }
+      setTimeout(done, DUR + 20);
+    } else {
+      // backward: `to` starts turned over on the spine, turns back down over `from`
+      from.style.zIndex = '1'; from.style.transform = 'rotateY(0deg)';
+      to.hidden = false; to.style.zIndex = '2';
+      to.style.transition = 'none'; to.style.transform = 'rotateY(-180deg)';
+      if (toShade) { toShade.style.transition = 'none'; toShade.style.opacity = '1'; }
       void to.offsetWidth;
-      to.style.transition = 'transform .24s ease-out, opacity .24s ease-out';
+      to.style.transition = 'transform ' + DUR + 'ms cubic-bezier(.4,0,.2,1)';
       to.style.transform = 'rotateY(0deg)';
-      to.style.opacity = '1';
-      cur = n; paint();
-      setTimeout(() => { to.style.cssText = ''; busy = false; }, 260);
-    }, 200);
+      if (toShade) { toShade.style.transition = 'opacity ' + (DUR * 0.7) + 'ms ease'; toShade.style.opacity = '0'; }
+      setTimeout(done, DUR + 20);
+    }
   }
 
-  tabs.forEach((t, i) => t.addEventListener('click', (e) => { e.preventDefault(); goTo(i); }));
+  tabs.forEach((t, i) => t.addEventListener('click', (e) => { e.preventDefault(); goTo(i + TOUR0); }));
   if (prev) prev.addEventListener('click', () => goTo(cur - 1));
   if (next) next.addEventListener('click', () => goTo(cur + 1));
 
@@ -1134,10 +1205,9 @@ document.querySelectorAll('.reveal').forEach((el, i) => {
     if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); goTo(cur + 1); }
     else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); goTo(cur - 1); }
     else if (e.key === 'Home') { e.preventDefault(); goTo(0); }
-    else if (e.key === 'End') { e.preventDefault(); goTo(sheets.length - 1); }
+    else if (e.key === 'End') { e.preventDefault(); goTo(cards.length - 1); }
   });
 
-  // swipe on touch
   let sx = 0, sy = 0, tracking = false;
   stage.addEventListener('pointerdown', (e) => { sx = e.clientX; sy = e.clientY; tracking = true; });
   stage.addEventListener('pointerup', (e) => {
@@ -1146,6 +1216,8 @@ document.querySelectorAll('.reveal').forEach((el, i) => {
     if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.5) goTo(cur + (dx < 0 ? 1 : -1));
   });
   stage.addEventListener('pointercancel', () => { tracking = false; });
+
+  let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(sizeStage, 150); }, { passive: true });
 })();
 
 /* Enquiry form */
