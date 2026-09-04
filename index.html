@@ -386,18 +386,33 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
    (absolute) so the incoming page shows beneath the outgoing one during a turn;
    only one is ever visible at rest, so there is still no two-page spread. The
    stage height is set by the script to the tallest card. */
-.menu__stage--live{ position:relative; perspective:2200px; }
+.menu__stage--live{ position:relative; perspective:1500px; perspective-origin:50% 42%; }
 .menu__stage--live .menu__sheet{
   position:absolute; top:0; left:0; width:100%; height:100%; margin:0;
-  overflow:hidden; backface-visibility:hidden; transform-origin:left center;
-  will-change:transform;
+  overflow:hidden; backface-visibility:hidden; -webkit-backface-visibility:hidden;
+  transform-origin:center top; will-change:transform;
 }
 .menu__stage--live .menu__sheet[hidden]{ display:none; }
 .menu__stage:focus-visible{ outline:2px solid var(--gold); outline-offset:8px; }
-/* a soft shadow sweeps across the page as it turns */
+/* the lift's self-shadow: paper stays lit near the hinge at the top and falls into
+   shadow toward the lifting bottom edge, so the flat page reads as one peeling up. */
 .menu__sheet__shade{
   position:absolute; inset:0; pointer-events:none; opacity:0;
-  background:linear-gradient(105deg, rgba(42,46,38,0) 55%, rgba(42,46,38,.22) 100%);
+  background:linear-gradient(to bottom,
+    rgba(255,252,244,.13) 0%,
+    rgba(255,252,244,0) 16%,
+    rgba(42,46,38,0) 44%,
+    rgba(38,42,32,.32) 85%,
+    rgba(16,18,13,.52) 100%);
+}
+/* the shadow the lifting page casts onto the page settling beneath it, deepest under
+   the hinge at the top and fading down — makes the reveal read as one page under another. */
+.menu__sheet__cast{
+  position:absolute; inset:0; pointer-events:none; opacity:0;
+  background:linear-gradient(to bottom,
+    rgba(16,18,13,.38) 0%,
+    rgba(16,18,13,.12) 24%,
+    rgba(16,18,13,0) 52%);
 }
 
 /* the front cover — the closed booklet, in the site's own green */
@@ -1112,7 +1127,10 @@ document.querySelectorAll('.reveal').forEach((el, i) => {
 
   const cards = [cover].concat(tours);   // [cover, city, wider, whole]
   const TOUR0 = 1;
-  cards.forEach((c) => { const sh = document.createElement('span'); sh.className = 'menu__sheet__shade'; c.appendChild(sh); });
+  cards.forEach((c) => {
+    const sh = document.createElement('span'); sh.className = 'menu__sheet__shade'; c.appendChild(sh);
+    const ca = document.createElement('span'); ca.className = 'menu__sheet__cast'; c.appendChild(ca);
+  });
 
   stage.classList.add('menu__stage--live');
   stage.setAttribute('role', 'group');
@@ -1156,7 +1174,8 @@ document.querySelectorAll('.reveal').forEach((el, i) => {
   }
   paint();
 
-  const DUR = 520;
+  const DUR = 560;
+  const EASE = 'cubic-bezier(.5,0,.2,1)';   // paper: eases up off the page, settles at the top
   let busy = false;
   function goTo(n) {
     n = Math.max(0, Math.min(cards.length - 1, n));
@@ -1167,32 +1186,44 @@ document.querySelectorAll('.reveal').forEach((el, i) => {
     busy = true;
     const fromShade = from.querySelector('.menu__sheet__shade');
     const toShade = to.querySelector('.menu__sheet__shade');
+    const fromCast = from.querySelector('.menu__sheet__cast');
+    const toCast = to.querySelector('.menu__sheet__cast');
     const done = () => {
       from.hidden = true; from.removeAttribute('style');
       to.hidden = false; to.removeAttribute('style');
-      if (fromShade) fromShade.removeAttribute('style');
-      if (toShade) toShade.removeAttribute('style');
+      [fromShade, toShade, fromCast, toCast].forEach((el) => { if (el) el.removeAttribute('style'); });
       cur = n; busy = false; paint();
     };
+    // The page turns to UPRIGHT (edge-on) and hands off there — it never rotates its
+    // back to the viewer, so a mirrored "backface" page can never show (Safari ignores
+    // backface-visibility on overflow:hidden content, so we simply never rely on it).
+    const TURN = 'transform ' + DUR + 'ms ' + EASE;
+    const UP = 'rotateX(-90deg)';
     if (dir > 0) {
-      // forward: reveal `to` beneath; turn `from` up and over on the spine
-      to.hidden = false; to.style.zIndex = '1'; to.style.transform = 'rotateY(0deg)';
-      from.style.zIndex = '2'; from.style.transition = 'none'; from.style.transform = 'rotateY(0deg)';
+      // forward: `to` sits flat beneath, shadowed near the spine; `from` lifts off the
+      // spine to upright, darkening into its own shadow as the page beneath is revealed.
+      to.hidden = false; to.style.zIndex = '1'; to.style.transform = 'rotateX(0deg)';
+      if (toCast) { toCast.style.transition = 'none'; toCast.style.opacity = '1'; }
+      from.style.zIndex = '2'; from.style.transition = 'none'; from.style.transform = 'rotateX(0deg)';
       void from.offsetWidth;
-      from.style.transition = 'transform ' + DUR + 'ms cubic-bezier(.4,0,.2,1)';
-      from.style.transform = 'rotateY(-180deg)';
-      if (fromShade) { fromShade.style.transition = 'opacity ' + (DUR * 0.6) + 'ms ease'; fromShade.style.opacity = '1'; }
+      from.style.transition = TURN;
+      from.style.transform = UP;
+      if (fromShade) { fromShade.style.transition = 'opacity ' + DUR + 'ms ease-in'; fromShade.style.opacity = '1'; }
+      if (toCast) { toCast.style.transition = 'opacity ' + DUR + 'ms ease-out'; toCast.style.opacity = '0'; }
       setTimeout(done, DUR + 20);
     } else {
-      // backward: `to` starts turned over on the spine, turns back down over `from`
-      from.style.zIndex = '1'; from.style.transform = 'rotateY(0deg)';
+      // backward: `from` stays flat beneath; `to` starts upright on the spine and
+      // settles back down flat over it, coming out of shadow as it lands.
+      from.style.zIndex = '1'; from.style.transform = 'rotateX(0deg)';
+      if (fromCast) { fromCast.style.transition = 'none'; fromCast.style.opacity = '0'; }
       to.hidden = false; to.style.zIndex = '2';
-      to.style.transition = 'none'; to.style.transform = 'rotateY(-180deg)';
+      to.style.transition = 'none'; to.style.transform = UP;
       if (toShade) { toShade.style.transition = 'none'; toShade.style.opacity = '1'; }
       void to.offsetWidth;
-      to.style.transition = 'transform ' + DUR + 'ms cubic-bezier(.4,0,.2,1)';
-      to.style.transform = 'rotateY(0deg)';
-      if (toShade) { toShade.style.transition = 'opacity ' + (DUR * 0.7) + 'ms ease'; toShade.style.opacity = '0'; }
+      to.style.transition = TURN;
+      to.style.transform = 'rotateX(0deg)';
+      if (toShade) { toShade.style.transition = 'opacity ' + DUR + 'ms ease-out'; toShade.style.opacity = '0'; }
+      if (fromCast) { fromCast.style.transition = 'opacity ' + Math.round(DUR * 0.6) + 'ms ease-in'; fromCast.style.opacity = '.4'; }
       setTimeout(done, DUR + 20);
     }
   }
