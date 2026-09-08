@@ -15,6 +15,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="guidebook.js" defer></script>
 <style>
 /* ─────────────────────────────────────────────────────────
    Unscripted Travel
@@ -349,123 +350,7 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
 }
 .journey__cta:hover,.journey__cta:focus-visible{ border-bottom-color:var(--ink); }
 
-/* ── Add-on menu: one card you turn ──────────────────────────────
-   One card shows a single journey at a time; the index and Prev/Next flip it
-   with a light 3D turn. Only ONE card is ever rendered, so no browser can produce
-   a two-page spread. With no JavaScript, or reduced motion, the journeys fall
-   back to plain stacked cards. ── */
-.menu__book{ max-width:440px; margin:clamp(40px,5vw,72px) auto 0; }
-
-/* the index — jump links with no JS, page pickers once live */
-.menu__index{
-  display:flex; flex-wrap:wrap; gap:4px; margin-bottom:clamp(18px,2.4vw,26px);
-  padding-bottom:14px; border-bottom:1px solid rgba(42,46,38,.14);
-}
-.menu__tab{
-  appearance:none; border:0; background:none; cursor:pointer;
-  font-family:var(--mono); font-size:.62rem; letter-spacing:.14em; text-transform:uppercase;
-  color:var(--ink-faint); text-decoration:none; padding:7px 12px;
-  border-bottom:1px solid transparent; transition:color .25s ease,border-color .25s ease;
-}
-.menu__tab:hover,.menu__tab:focus-visible{ color:var(--ink); }
-.menu__tab[aria-current]{ color:var(--ink); border-bottom-color:var(--gold); }
-
-/* the card — grained paper. Stacked with no JS; a single flipping card once live. */
-.menu__sheet{
-  background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='pg'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.6' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23pg)' opacity='.11'/%3E%3C/svg%3E") 0 0/140px 140px,
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='pm'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.02' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23pm)' opacity='.05'/%3E%3C/svg%3E") 0 0/300px 300px,
-    var(--cream-2);
-  box-sizing:border-box;
-  padding:clamp(24px,3.2vw,40px) clamp(20px,3vw,40px);
-  border:1px solid rgba(176,141,79,.32); scroll-margin-top:24px;
-}
-.menu__sheet + .menu__sheet{ margin-top:clamp(24px,3.2vw,40px); }
-
-/* live: one card at rest, turned on its spine like a real page. Cards overlap
-   (absolute) so the incoming page shows beneath the outgoing one during a turn;
-   only one is ever visible at rest, so there is still no two-page spread. The
-   stage height is set by the script to the tallest card. */
-.menu__stage--live{ position:relative; perspective:1500px; perspective-origin:50% 42%; }
-.menu__stage--live .menu__sheet{
-  position:absolute; top:0; left:0; width:100%; height:100%; margin:0;
-  overflow:hidden; backface-visibility:hidden; -webkit-backface-visibility:hidden;
-  transform-origin:center top; will-change:transform;
-}
-.menu__stage--live .menu__sheet[hidden]{ display:none; }
-.menu__stage:focus-visible{ outline:2px solid var(--gold); outline-offset:8px; }
-/* the lift's self-shadow: paper stays lit near the hinge at the top and falls into
-   shadow toward the lifting bottom edge, so the flat page reads as one peeling up. */
-.menu__sheet__shade{
-  position:absolute; inset:0; pointer-events:none; opacity:0;
-  background:linear-gradient(to bottom,
-    rgba(255,252,244,.13) 0%,
-    rgba(255,252,244,0) 16%,
-    rgba(42,46,38,0) 44%,
-    rgba(38,42,32,.32) 85%,
-    rgba(16,18,13,.52) 100%);
-}
-/* the shadow the lifting page casts onto the page settling beneath it, deepest under
-   the hinge at the top and fading down — makes the reveal read as one page under another. */
-.menu__sheet__cast{
-  position:absolute; inset:0; pointer-events:none; opacity:0;
-  background:linear-gradient(to bottom,
-    rgba(16,18,13,.38) 0%,
-    rgba(16,18,13,.12) 24%,
-    rgba(16,18,13,0) 52%);
-}
-
-/* the front cover — the closed booklet, in the site's own green */
-.menu__cover{
-  background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='cg'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.6' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23cg)' opacity='.08'/%3E%3C/svg%3E") 0 0/140px 140px,
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='cm'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.02' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23cm)' opacity='.05'/%3E%3C/svg%3E") 0 0/300px 300px,
-    var(--cover);
-  color:var(--cream); border-color:rgba(216,188,124,.3);
-  display:flex; flex-direction:column; justify-content:center;
-}
-.menu__cover .mk{ font-weight:500; font-size:.76rem; letter-spacing:.3em; text-transform:uppercase; color:var(--gold-lit); margin:0; }
-.menu__cover h3{ font-weight:300; text-transform:uppercase; letter-spacing:.16em; font-size:clamp(1.6rem,1.2rem + 1.6vw,2.4rem); margin:1.1rem 0 0; color:var(--sage-lit); }
-.menu__cover .rule{ background:var(--gold-lit); margin-top:1.4rem; }
-.menu__cover .hint{ font-family:var(--mono); font-size:.6rem; letter-spacing:.12em; text-transform:uppercase; color:rgba(242,237,227,.74); margin:1.6rem 0 0; }
-
-.menu__head{ display:flex; justify-content:space-between; align-items:baseline; gap:20px; }
-.menu__len{ font-family:var(--mono); font-size:.66rem; letter-spacing:.18em; text-transform:uppercase; color:var(--ink-faint); margin:0 0 .5rem; }
-.menu__tour{ font-weight:300; text-transform:uppercase; letter-spacing:var(--track-title); font-size:clamp(1.1rem,1rem + .7vw,1.5rem); margin:0; color:var(--sage); }
-.menu__count{ flex:0 0 auto; }
-
-.menu__rows{ list-style:none; margin:clamp(14px,2vw,20px) 0 0; padding:0; }
-.menu__row{ display:flex; justify-content:space-between; align-items:baseline; gap:14px 24px; padding:clamp(12px,1.7vw,17px) 0; border-top:1px solid rgba(42,46,38,.14); }
-.menu__item{ min-width:0; }
-.menu__name{ display:block; font-weight:500; font-size:.8rem; letter-spacing:.05em; text-transform:uppercase; color:var(--ink); line-height:1.3; }
-.menu__note{ display:block; margin-top:4px; color:var(--ink-soft); font-size:.9rem; line-height:1.45; text-wrap:pretty; }
-.menu__price{ flex:0 0 auto; font-size:.9rem; }
-
-/* pager — hidden until the script shows it (explicit display beats [hidden]) */
-.menu__pager{
-  display:flex; justify-content:space-between; align-items:center; gap:16px;
-  margin-top:clamp(18px,2.4vw,26px); padding-top:16px;
-  border-top:1px solid rgba(42,46,38,.14);
-}
-.menu__pager[hidden]{ display:none; }
-.menu__nav{
-  appearance:none; border:0; background:none; cursor:pointer;
-  font-family:var(--mono); font-size:.64rem; letter-spacing:.2em; text-transform:uppercase;
-  color:var(--ink); padding:8px 2px; display:inline-flex; align-items:center; gap:9px;
-  transition:opacity .25s ease;
-}
-.menu__nav[disabled]{ opacity:.28; cursor:default; }
-.menu__arrow{ display:inline-block; transition:transform .25s ease; }
-.menu__nav:not([disabled]):hover .menu__arrow{ transform:translateX(var(--sx,0)); }
-.menu__prev{ --sx:-3px; }
-.menu__next{ --sx:3px; }
-.menu__sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap; }
-
-@media (max-width:560px){ .menu__book{ max-width:none; } }
-@media (prefers-reduced-motion:reduce){
-  .menu__arrow{ transition:none; }
-  .menu__stage--live .menu__sheet{ transition:none !important; transform:none !important; }
-}
+/* The interactive guidebook is styled in guidebook.css. */
 
 /* ── Words (client supplies the real quote) ── */
 .words{ text-align:center; }
@@ -589,6 +474,7 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
   .journey::after{ transition:none; }
 }
 </style>
+<link rel="stylesheet" href="guidebook.css">
 </head>
 <body>
 
@@ -754,26 +640,38 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
     </div>
   </section>
 
-  <!-- Add-on menu: one card at a time. The three journeys ship as real, stacked,
-       readable markup (works with no JS); the script shows one card and flips
-       between them. No two-page spread exists in any state. -->
+  <!-- Canonical guidebook content. The editor updates this markup, so prices
+       remain readable without JavaScript and never need maintaining twice. -->
   <section class="section menu" id="add-ons">
     <div class="wrap">
       <div class="reveal">
         <p class="eyebrow">Add to any journey<span class="idx">04 / 05</span></p>
-        <h2 class="title">Add-ons</h2>
+        <h2 class="title">The guide book</h2>
         <hr class="rule">
-        <p class="lede">The things people ask us to build in, by journey — prices per person, the trip itself quoted once we've spoken.</p>
+        <p class="lede" data-guide-intro>A few ways to make the journey yours. Open the book and explore the extras — the trip itself is shaped once we've spoken.</p>
       </div>
 
       <div class="menu__book">
         <div class="menu__index">
+          <a class="menu__tab menu__cover-tab" href="#guide-cover">Cover</a>
           <a class="menu__tab" href="#sheet-city">The city and the coast</a>
           <a class="menu__tab" href="#sheet-wider">Wider, and slower</a>
           <a class="menu__tab" href="#sheet-whole">The whole thing</a>
         </div>
 
         <div class="menu__stage" id="addon-stage">
+        <article class="menu__sheet menu__cover" id="guide-cover">
+          <p class="guide__edition" data-guide-edition>Cape Town · South Africa</p>
+          <div class="guide__lockup">
+            <p class="guide__brand" data-guide-brand>Unscripted<br>Travel</p>
+            <span class="guide__foil-rule" aria-hidden="true"></span>
+            <h3 class="guide__cover-title" data-guide-title>Guide Book</h3>
+          </div>
+          <div class="guide__cover-foot">
+            <p data-guide-tagline>Considered journeys. Unscripted days.</p>
+            <a class="guide__open" href="#sheet-city">Open the book <span aria-hidden="true">↗</span></a>
+          </div>
+        </article>
         <article class="menu__sheet" id="sheet-city">
           <header class="menu__head">
             <div>
@@ -788,28 +686,28 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
               <span class="menu__name">Helicopter transfer to Cape Point</span>
               <span class="menu__note">A loop over the peninsula on the way down, weather permitting.</span>
             </div>
-            <span class="menu__price coord">R 0 000</span>
+            <span class="menu__price coord">On request</span>
           </li>
           <li class="menu__row">
             <div class="menu__item">
               <span class="menu__name">Private cellar tasting, Constantia</span>
               <span class="menu__note">The oldest wine estate in the country, by appointment.</span>
             </div>
-            <span class="menu__price coord">R 0 000</span>
+            <span class="menu__price coord">On request</span>
           </li>
           <li class="menu__row">
             <div class="menu__item">
               <span class="menu__name">Sunset dhow off the Atlantic Seaboard</span>
               <span class="menu__note">An hour on the water as the light goes.</span>
             </div>
-            <span class="menu__price coord">R 0 000</span>
+            <span class="menu__price coord">On request</span>
           </li>
           <li class="menu__row">
             <div class="menu__item">
               <span class="menu__name">Chef's table, one evening</span>
               <span class="menu__note">A seat in the kitchen instead of the dining room.</span>
             </div>
-            <span class="menu__price coord">R 0 000</span>
+            <span class="menu__price coord">On request</span>
           </li>
           </ul>
         </article>
@@ -827,28 +725,28 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
               <span class="menu__name">Franschhoek by private car</span>
               <span class="menu__note">The estates on your own timetable, not the wine tram's.</span>
             </div>
-            <span class="menu__price coord">R 0 000</span>
+            <span class="menu__price coord">On request</span>
           </li>
           <li class="menu__row">
             <div class="menu__item">
               <span class="menu__name">Cape Town food walk, Bo-Kaap</span>
               <span class="menu__note">The neighbourhood and the market, with someone who cooks.</span>
             </div>
-            <span class="menu__price coord">R 0 000</span>
+            <span class="menu__price coord">On request</span>
           </li>
           <li class="menu__row">
             <div class="menu__item">
               <span class="menu__name">Whale watching from Hermanus</span>
               <span class="menu__note">Boat-based, in season — roughly June to November.</span>
             </div>
-            <span class="menu__price coord">R 0 000</span>
+            <span class="menu__price coord">On request</span>
           </li>
           <li class="menu__row">
             <div class="menu__item">
               <span class="menu__name">A day in the Cederberg</span>
               <span class="menu__note">Rock art and the pass road up, an early start.</span>
             </div>
-            <span class="menu__price coord">R 0 000</span>
+            <span class="menu__price coord">On request</span>
           </li>
           </ul>
         </article>
@@ -866,37 +764,40 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
               <span class="menu__name">Private reserve, two nights</span>
               <span class="menu__note">Big Five, guided game drives, full board.</span>
             </div>
-            <span class="menu__price coord">R 0 000</span>
+            <span class="menu__price coord">On request</span>
           </li>
           <li class="menu__row">
             <div class="menu__item">
               <span class="menu__name">Garden Route with a guide</span>
               <span class="menu__note">Knysna, the forests and the passes, at your pace.</span>
             </div>
-            <span class="menu__price coord">R 0 000</span>
+            <span class="menu__price coord">On request</span>
           </li>
           <li class="menu__row">
             <div class="menu__item">
               <span class="menu__name">Robben Island and District Six</span>
               <span class="menu__note">The history told properly, by people who lived it.</span>
             </div>
-            <span class="menu__price coord">R 0 000</span>
+            <span class="menu__price coord">On request</span>
           </li>
           <li class="menu__row">
             <div class="menu__item">
               <span class="menu__name">Light-aircraft leg to the reserve</span>
               <span class="menu__note">Skip the drive east — an hour in the air instead.</span>
             </div>
-            <span class="menu__price coord">R 0 000</span>
+            <span class="menu__price coord">On request</span>
           </li>
           </ul>
         </article>
         </div>
 
+        <p class="guide__pricing" data-guide-pricing>Prices on request until confirmed. Published prices are per person unless stated otherwise.</p>
         <div class="menu__pager" hidden>
           <button type="button" class="menu__nav menu__prev" aria-label="Previous page"><span class="menu__arrow" aria-hidden="true">&lsaquo;</span> Previous</button>
+          <span class="guide__position" aria-live="polite" aria-atomic="true">Front cover</span>
           <button type="button" class="menu__nav menu__next" aria-label="Next page">Next <span class="menu__arrow" aria-hidden="true">&rsaquo;</span></button>
         </div>
+        <p class="guide__gesture" hidden>Drag a page, swipe, or use the arrows to turn.</p>
       </div>
     </div>
   </section>
@@ -1095,161 +996,7 @@ document.querySelectorAll('.reveal').forEach((el, i) => {
   update();
 })();
 
-/* ── The add-on menu: a booklet you turn ──
-   The three journeys are real, stacked, readable markup (works with no JS). Here
-   a green front cover is added and it becomes one card at a time, turned on its
-   spine — the incoming page shows beneath the outgoing one as it turns over. Only
-   one card is ever visible at rest, so no browser renders a two-page spread.
-   Reduced motion swaps instantly. */
-(function () {
-  const book  = document.querySelector('.menu__book');
-  const stage = document.getElementById('addon-stage');
-  if (!book || !stage) return;
-  const tabs  = Array.from(book.querySelectorAll('.menu__tab'));
-  const tours = Array.from(stage.querySelectorAll('.menu__sheet'));
-  const pager = book.querySelector('.menu__pager');
-  const prev  = book.querySelector('.menu__prev');
-  const next  = book.querySelector('.menu__next');
-  if (!tours.length || tabs.length !== tours.length) return;
-
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  // green front cover, card 0 (decoration the no-JS view skips)
-  const cover = document.createElement('article');
-  cover.className = 'menu__sheet menu__cover';
-  cover.setAttribute('aria-label', 'Add-ons — cover');
-  cover.innerHTML =
-    '<p class="mk">Unscripted Travel</p>' +
-    '<h3>Add-ons</h3>' +
-    '<hr class="rule">' +
-    '<p class="hint">Turn the page &rsaquo;</p>';
-  stage.insertBefore(cover, tours[0]);
-
-  const cards = [cover].concat(tours);   // [cover, city, wider, whole]
-  const TOUR0 = 1;
-  cards.forEach((c) => {
-    const sh = document.createElement('span'); sh.className = 'menu__sheet__shade'; c.appendChild(sh);
-    const ca = document.createElement('span'); ca.className = 'menu__sheet__cast'; c.appendChild(ca);
-  });
-
-  stage.classList.add('menu__stage--live');
-  stage.setAttribute('role', 'group');
-  stage.setAttribute('aria-roledescription', 'Booklet — one page at a time');
-  stage.setAttribute('aria-label', 'Add-ons by journey');
-  stage.tabIndex = 0;
-  const sr = document.createElement('p');
-  sr.className = 'menu__sr'; sr.setAttribute('aria-live', 'polite');
-  book.appendChild(sr);
-  tabs.forEach((t, i) => t.setAttribute('aria-controls', tours[i].id));
-
-  let cur = 0;
-  const hashTour = tours.findIndex((s2) => '#' + s2.id === location.hash);
-  if (hashTour >= 0) cur = hashTour + TOUR0;
-
-  // size the stage to the tallest page (measured in normal flow, before overlap)
-  function sizeStage() {
-    cards.forEach((c) => { c.style.position = 'static'; c.style.height = 'auto'; c.hidden = false; });
-    let max = 0;
-    cards.forEach((c) => { max = Math.max(max, c.offsetHeight); });
-    cards.forEach((c, i) => { c.style.position = ''; c.style.height = ''; c.hidden = i !== cur; });
-    stage.style.height = max + 'px';
-  }
-  sizeStage();
-  if (pager) pager.hidden = false;
-
-  function paint() {
-    const tourIdx = cur - TOUR0;
-    tabs.forEach((t, i) => { if (i === tourIdx) t.setAttribute('aria-current', 'page'); else t.removeAttribute('aria-current'); });
-    const held = document.activeElement;
-    if (prev) prev.disabled = cur === 0;
-    if (next) next.disabled = cur === cards.length - 1;
-    if (held === prev && prev.disabled) (next && !next.disabled ? next : stage).focus();
-    else if (held === next && next.disabled) (prev && !prev.disabled ? prev : stage).focus();
-    if (tourIdx >= 0) {
-      const name = tours[tourIdx].querySelector('.menu__tour');
-      sr.textContent = 'Journey ' + (tourIdx + 1) + ' of ' + tours.length + (name ? ': ' + name.textContent : '');
-    } else {
-      sr.textContent = 'Front cover';
-    }
-  }
-  paint();
-
-  const DUR = 560;
-  const EASE = 'cubic-bezier(.5,0,.2,1)';   // paper: eases up off the page, settles at the top
-  let busy = false;
-  function goTo(n) {
-    n = Math.max(0, Math.min(cards.length - 1, n));
-    if (n === cur || busy) return;
-    const dir = n > cur ? 1 : -1;
-    const from = cards[cur], to = cards[n];
-    if (reduce) { from.hidden = true; to.hidden = false; cur = n; paint(); return; }
-    busy = true;
-    const fromShade = from.querySelector('.menu__sheet__shade');
-    const toShade = to.querySelector('.menu__sheet__shade');
-    const fromCast = from.querySelector('.menu__sheet__cast');
-    const toCast = to.querySelector('.menu__sheet__cast');
-    const done = () => {
-      from.hidden = true; from.removeAttribute('style');
-      to.hidden = false; to.removeAttribute('style');
-      [fromShade, toShade, fromCast, toCast].forEach((el) => { if (el) el.removeAttribute('style'); });
-      cur = n; busy = false; paint();
-    };
-    // The page turns to UPRIGHT (edge-on) and hands off there — it never rotates its
-    // back to the viewer, so a mirrored "backface" page can never show (Safari ignores
-    // backface-visibility on overflow:hidden content, so we simply never rely on it).
-    const TURN = 'transform ' + DUR + 'ms ' + EASE;
-    const UP = 'rotateX(-90deg)';
-    if (dir > 0) {
-      // forward: `to` sits flat beneath, shadowed near the spine; `from` lifts off the
-      // spine to upright, darkening into its own shadow as the page beneath is revealed.
-      to.hidden = false; to.style.zIndex = '1'; to.style.transform = 'rotateX(0deg)';
-      if (toCast) { toCast.style.transition = 'none'; toCast.style.opacity = '1'; }
-      from.style.zIndex = '2'; from.style.transition = 'none'; from.style.transform = 'rotateX(0deg)';
-      void from.offsetWidth;
-      from.style.transition = TURN;
-      from.style.transform = UP;
-      if (fromShade) { fromShade.style.transition = 'opacity ' + DUR + 'ms ease-in'; fromShade.style.opacity = '1'; }
-      if (toCast) { toCast.style.transition = 'opacity ' + DUR + 'ms ease-out'; toCast.style.opacity = '0'; }
-      setTimeout(done, DUR + 20);
-    } else {
-      // backward: `from` stays flat beneath; `to` starts upright on the spine and
-      // settles back down flat over it, coming out of shadow as it lands.
-      from.style.zIndex = '1'; from.style.transform = 'rotateX(0deg)';
-      if (fromCast) { fromCast.style.transition = 'none'; fromCast.style.opacity = '0'; }
-      to.hidden = false; to.style.zIndex = '2';
-      to.style.transition = 'none'; to.style.transform = UP;
-      if (toShade) { toShade.style.transition = 'none'; toShade.style.opacity = '1'; }
-      void to.offsetWidth;
-      to.style.transition = TURN;
-      to.style.transform = 'rotateX(0deg)';
-      if (toShade) { toShade.style.transition = 'opacity ' + DUR + 'ms ease-out'; toShade.style.opacity = '0'; }
-      if (fromCast) { fromCast.style.transition = 'opacity ' + Math.round(DUR * 0.6) + 'ms ease-in'; fromCast.style.opacity = '.4'; }
-      setTimeout(done, DUR + 20);
-    }
-  }
-
-  tabs.forEach((t, i) => t.addEventListener('click', (e) => { e.preventDefault(); goTo(i + TOUR0); }));
-  if (prev) prev.addEventListener('click', () => goTo(cur - 1));
-  if (next) next.addEventListener('click', () => goTo(cur + 1));
-
-  stage.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); goTo(cur + 1); }
-    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); goTo(cur - 1); }
-    else if (e.key === 'Home') { e.preventDefault(); goTo(0); }
-    else if (e.key === 'End') { e.preventDefault(); goTo(cards.length - 1); }
-  });
-
-  let sx = 0, sy = 0, tracking = false;
-  stage.addEventListener('pointerdown', (e) => { sx = e.clientX; sy = e.clientY; tracking = true; });
-  stage.addEventListener('pointerup', (e) => {
-    if (!tracking) return; tracking = false;
-    const dx = e.clientX - sx, dy = e.clientY - sy;
-    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.5) goTo(cur + (dx < 0 ? 1 : -1));
-  });
-  stage.addEventListener('pointercancel', () => { tracking = false; });
-
-  let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(sizeStage, 150); }, { passive: true });
-})();
+/* The guidebook is progressively enhanced by guidebook.js. */
 
 /* Enquiry form */
 const form = document.getElementById('enquiry');

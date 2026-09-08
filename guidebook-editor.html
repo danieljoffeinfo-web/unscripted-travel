@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Guidebook editor — Unscripted Travel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing:border-box; }
+    body { margin:0; background:#f2ede3; color:#29352b; font:16px/1.6 'Jost',system-ui,sans-serif; }
+    header { padding:25px 32px; border-bottom:1px solid #c8c5b7; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px; }
+    h1 { font-size:1.65rem; font-weight:400; line-height:1.3; margin:0; }
+    header p { font-size:.875rem; margin:5px 0 0; color:#5b6053; }
+    a { color:inherit; text-underline-offset:4px; }
+    button,.file-button { border:1px solid #53604d; color:#29352b; background:transparent; padding:11px 16px; font:inherit; font-size:.875rem; cursor:pointer; text-decoration:none; display:inline-block; border-radius:2px; }
+    button.primary { color:#f9f4e8; background:#293b30; border-color:#293b30; }
+    button:disabled { opacity:.4; cursor:default; }
+    button:hover:not(:disabled),.file-button:hover { box-shadow:inset 0 0 0 1px currentColor; }
+    :focus-visible { outline:2px solid #8b6c35; outline-offset:3px; }
+    .actions { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .workspace { display:grid; grid-template-columns:420px minmax(0,1fr); }
+    .editing { padding:26px 28px 40px; max-height:calc(100dvh - 123px); overflow:auto; border-right:1px solid #c8c5b7; }
+    .preview { position:sticky; top:0; height:calc(100dvh - 123px); min-height:700px; }
+    iframe { width:100%; height:100%; border:0; }
+    .notice { font-size:.875rem; padding:16px; background:#e6e3d7; margin:0 0 22px; }
+    .notice p { margin:0 0 8px; }
+    .notice ol { margin:8px 0 0; padding-left:18px; }
+    #editor-status { font-size:.875rem; color:#465b41; min-height:1.6em; }
+    #editor-status[data-error] { color:#8c2b23; }
+    fieldset { border:0; padding:0; margin:0; min-width:0; }
+    label { display:block; font-size:.875rem; font-weight:500; margin:16px 0 5px; }
+    input,textarea,select { width:100%; font:inherit; line-height:1.5; padding:10px 11px; border:1px solid #b7b9a8; border-radius:2px; background:#fbf8f1; color:#29352b; }
+    textarea { min-height:88px; resize:vertical; }
+    input[type=file] { position:absolute; width:1px; height:1px; opacity:0; }
+    .file-button:has(input:focus-visible) { outline:2px solid #8b6c35; outline-offset:3px; }
+    .file-button { margin:0; font-weight:400; }
+    .group { padding-bottom:24px; margin-bottom:24px; border-bottom:1px solid #b7b9a8; }
+    h2 { font-size:1.15rem; font-weight:500; margin:22px 0 10px; }
+    h3 { font-size:.875rem; font-weight:500; margin:26px 0 0; text-transform:uppercase; letter-spacing:.1em; }
+    .group:first-child h2 { margin-top:20px; }
+    #load-retry[hidden],[hidden] { display:none !important; }
+    .preview-label { position:absolute; top:0; right:0; padding:7px 14px; font-size:.75rem; color:#f8f0e1; background:#293b30; z-index:1; pointer-events:none; }
+    @media (max-width:1100px) { .workspace { grid-template-columns:360px minmax(0,1fr); } }
+    @media (max-width:850px) { header { padding:22px; } .workspace { grid-template-columns:1fr; } .editing { max-height:none; overflow:visible; border:0; padding:20px; } .preview { position:relative; height:850px; min-height:0; border-top:1px solid #c8c5b7; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div><h1>Guidebook editor</h1><p>Unscripted Travel</p></div>
+    <div class="actions">
+      <a href="index.html#add-ons" target="_blank" rel="noopener">View website</a>
+      <label class="file-button">Open a saved draft<input id="import" type="file" accept=".html,text/html" disabled></label>
+      <button class="primary" id="download" disabled>Download updated index.html</button>
+    </div>
+  </header>
+  <main class="workspace">
+    <section class="editing" aria-label="Guidebook content">
+      <div class="notice">
+        <p>This is a draft editor, not a live admin login. Changes stay in this tab until you download them.</p>
+        <ol>
+          <li>Edit and check the preview.</li>
+          <li>Download the updated <strong>index.html</strong>.</li>
+          <li><a href="https://github.com/danieljoffeinfo-web/unscripted-travel/upload/main" target="_blank" rel="noopener">Upload it to the repository</a> and commit to publish through your normal deployment.</li>
+        </ol>
+      </div>
+      <p id="editor-status" role="status" aria-live="polite">Loading the current guidebook…</p>
+      <button type="button" id="load-retry" hidden>Try loading again</button>
+      <form id="editor-form" hidden>
+        <label for="page-select">Page to edit</label>
+        <select id="page-select"><option value="0">Cover and book details</option></select>
+        <div id="fields"></div>
+      </form>
+      <noscript>Enable JavaScript to use this editor. The guidebook itself can still be read without it.</noscript>
+    </section>
+    <section class="preview" aria-label="Draft preview">
+      <span class="preview-label">Draft preview · not published</span>
+      <iframe id="preview" title="Interactive guidebook draft preview" src="index.html#add-ons"></iframe>
+    </section>
+  </main>
+  <script src="guidebook-editor.js" defer></script>
+</body>
+</html>

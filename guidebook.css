@@ -1,0 +1,104 @@
+/* A real side-bound object: rigid cover, paper leaves, visible reverse faces.
+   The texture is the client's existing photographed paper, not a new dependency. */
+.menu { --book-green:#293b30; --book-paper:#f5efe3; --book-gold:#e4cb91; }
+.menu__book { max-width:1080px; margin:48px auto 0; }
+.menu__index { display:flex; flex-wrap:wrap; justify-content:center; gap:8px 20px; margin:0 0 34px; }
+.menu__tab { padding:10px 2px; color:var(--ink-soft); font-size:.875rem; text-decoration:none; border-bottom:1px solid transparent; }
+.menu__tab:hover,.menu__tab[aria-current] { color:var(--ink); border-color:var(--gold); }
+.menu__sheet { position:relative; padding:36px; background:var(--book-paper); border:1px solid #c9c0ae; margin:0 0 24px; overflow-wrap:anywhere; scroll-margin-top:32px; }
+.menu__cover { min-height:580px; display:flex; flex-direction:column; justify-content:space-between; color:#f6efdf; text-align:center; border-radius:3px 9px 9px 3px; border:1px solid #203025;
+  background-color:var(--book-green);
+  background-image:linear-gradient(90deg,#101b179c,transparent 3%,#ffffff17 4%,#0718104d 6%,transparent 9%,#00000010 97%,#ffffff19),linear-gradient(#293b30e6,#25392feb),url('assets/kraft-tile.jpg');
+  background-size:100% 100%,100% 100%,200px 200px;
+  box-shadow:inset 0 0 0 1px #faf5d515,inset 0 0 28px #00000025;
+}
+.menu__cover::before { content:''; position:absolute; inset:21px 20px 21px 29px; border:1px solid #d4b97a55; box-shadow:inset 0 0 0 3px #00000012,0 1px #ffffff0d; border-radius:1px 4px 4px 1px; pointer-events:none; }
+.guide__edition { margin:7px 0; font-family:var(--mono); font-size:.75rem; letter-spacing:.15em; text-transform:uppercase; }
+.guide__lockup { padding:55px 0; }
+.guide__brand { margin:0; font-weight:300; line-height:1.45; font-size:clamp(2rem,3.2vw,3rem); letter-spacing:.13em; text-transform:uppercase; color:var(--book-gold); text-shadow:0 1px 0 #000,-1px -1px 0 #fff4; }
+.guide__foil-rule { display:block; width:64px; height:1px; margin:30px auto; background:linear-gradient(90deg,#99814e,#f3dcab,#a88a4f); box-shadow:0 1px #0008; }
+.guide__cover-title { margin:0; color:var(--book-gold); font-size:1rem; font-weight:400; text-transform:uppercase; letter-spacing:.3em; line-height:1.5; text-shadow:0 1px #000; }
+.guide__cover-foot { font-size:.875rem; position:relative; }
+.guide__cover-foot p { margin:0 0 18px; }
+.guide__open { display:inline-flex; align-items:center; gap:20px; color:#fff5db; font-size:.875rem; padding:12px 16px; text-decoration:none; border:1px solid #e4cb9166; }
+.guide__open:hover { background:#fff1; }
+.menu__head { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+.menu__len { margin:0 0 13px; font-family:var(--mono); font-size:.75rem; color:#59604e; text-transform:uppercase; letter-spacing:.12em; }
+.menu__tour { margin:0; color:#354536; font-size:clamp(1.5rem,2.2vw,2rem); font-weight:300; line-height:1.3; letter-spacing:.025em; }
+.menu__count { flex-shrink:0; font-family:var(--mono); font-size:.75rem; color:#59604e; padding-top:2px; letter-spacing:0; }
+.menu__rows { list-style:none; padding:0; margin:25px 0; }
+.menu__row { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:baseline; gap:14px; padding:19px 0; border-top:1px solid #4b543d2b; }
+.menu__name { display:block; color:#29352b; font-weight:500; font-size:1rem; line-height:1.4; }
+.menu__note { display:block; margin-top:7px; color:#5b6053; font-size:1rem; line-height:1.55; }
+.menu__price { max-width:8rem; font-family:var(--mono); font-size:.875rem; font-variant-numeric:tabular-nums; letter-spacing:0; color:#354536; white-space:normal; text-align:right; line-height:1.5; }
+.guide__page-foot { margin-top:auto; border-top:1px solid #b09b7066; padding-top:16px; display:flex; align-items:center; justify-content:space-between; gap:15px; }
+.guide__page-foot span { font-family:var(--mono); font-size:.75rem; letter-spacing:.1em; text-transform:uppercase; color:#59604e; }
+.guide__page-foot a { color:#354536; font-size:.875rem; text-underline-offset:5px; }
+.guide__pricing { max-width:670px; margin:36px auto 0; color:var(--ink-soft); font-size:.875rem; text-align:center; }
+.menu__pager { display:flex; justify-content:space-between; align-items:center; gap:15px; max-width:650px; margin:24px auto 0; border-top:1px solid #b3ad9f; padding-top:15px; }
+.menu__pager[hidden],.guide__gesture[hidden] { display:none; }
+.menu__nav { display:inline-flex; align-items:center; gap:10px; border:0; padding:12px 4px; background:transparent; font:inherit; font-size:.875rem; color:var(--ink); cursor:pointer; min-height:44px; }
+.menu__nav[disabled] { opacity:.35; cursor:default; }
+.menu__arrow { font-size:1.7rem; line-height:1; }
+.guide__position { font-family:var(--mono); font-size:.75rem; text-align:center; color:var(--ink-soft); }
+.guide__gesture { text-align:center; font-size:.875rem; color:var(--ink-soft); margin:15px 0 0; }
+
+/* Upgrade only after the complete accessible book has been assembled. */
+.guide__scene { perspective:2200px; perspective-origin:50% 42%; padding:12px 0 18px; }
+.menu__stage--live { position:relative; min-height:580px; transform-style:preserve-3d; transform:translateX(0) rotateX(var(--book-rx,0deg)) rotateY(var(--book-ry,0deg)); transition:transform 850ms cubic-bezier(.25,.65,.2,1); touch-action:pan-y pinch-zoom; }
+.menu__stage--live.is-closed { transform:translateX(-25%) rotateX(var(--book-rx,0deg)) rotateY(var(--book-ry,-5deg)); }
+.menu__stage--live:focus-visible { outline:2px solid var(--gold); outline-offset:12px; }
+.guide__leaf { position:absolute; left:50%; top:0; width:50%; height:100%; transform-origin:left center; transform-style:preserve-3d; transform:rotateY(0deg); transition:transform 850ms cubic-bezier(.25,.65,.2,1); }
+.guide__leaf.is-turned { transform:rotateY(-180deg); }
+.guide__leaf.is-turning { will-change:transform; }
+.guide__face { position:absolute; inset:0; height:100%; width:100%; margin:0; display:flex; flex-direction:column; backface-visibility:hidden; -webkit-backface-visibility:hidden; transform:rotateY(0deg) translateZ(.3px); box-shadow:1px 2px 2px #453b2520,4px 4px 0 -1px #d9d0bd,6px 6px 0 -2px #a49b88,10px 20px 28px -12px #1a231857; background-image:linear-gradient(90deg,#73644826,transparent 9%,transparent 96%,#fff8); border-radius:0 5px 5px 0; }
+.guide__face::after { content:''; position:absolute; inset:0; pointer-events:none; border-radius:inherit; background:linear-gradient(90deg,#17251a44,transparent 35%,#fcf7dc22); opacity:0; transition:opacity 425ms ease; }
+.guide__leaf.is-turning .guide__face::after { opacity:1; }
+.guide__face.menu__cover { border-radius:3px 9px 9px 3px; background-image:linear-gradient(90deg,#101b17c0,transparent 3%,#ffffff17 4%,#07181080 6%,transparent 9%,#00000010 97%,#ffffff19),linear-gradient(#293b30dd,#25392fe0),url('assets/kraft-tile.jpg'); box-shadow:inset 0 0 1px 1px #f5e6a540,4px 3px 0 #b5ae97,7px 6px 0 #dbd3bd,10px 9px 0 #273b2d,18px 26px 38px -12px #17241780; }
+.guide__back { transform:rotateY(180deg) translateZ(.3px); border-radius:5px 0 0 5px; background-image:linear-gradient(270deg,#57482e33,transparent 11%,#fff3); padding:36px; background-color:var(--book-paper); border:1px solid #c9c0ae; }
+.guide__back .guide__photo { margin:0; flex:1; display:flex; flex-direction:column; }
+.guide__photo img { width:100%; height:370px; object-fit:cover; flex:1; min-height:0; max-height:450px; border-radius:1px; }
+.guide__photo figcaption { display:block; border:0; padding:18px 0 0; color:#354536; font-size:1rem; }
+.guide__photo figcaption span { display:block; font-family:var(--mono); font-size:.75rem; margin-top:8px; text-transform:uppercase; letter-spacing:.12em; color:#59604e; }
+.guide__back-label { margin:0 0 20px; font-family:var(--mono); font-size:.75rem; letter-spacing:.12em; text-transform:uppercase; color:#59604e; }
+.guide--measure .guide__face { height:auto; min-height:580px; bottom:auto; }
+.guide--measure .guide__photo img { flex:none; }
+.guide--instant,.guide--instant .guide__leaf { transition:none !important; }
+
+@media (max-width:760px) {
+  .menu__book { margin-top:30px; }
+  .menu__index { gap:0 16px; justify-content:flex-start; margin-bottom:23px; }
+  .menu__tab { font-size:.875rem; }
+  .menu__sheet,.guide__back { padding:30px 24px; }
+  .menu__cover { padding:36px 30px; }
+  .guide__brand { font-size:clamp(1.8rem,7vw,2.8rem); }
+  .guide__scene { clip-path:inset(-32px -16px -44px -16px); }
+  .guide__leaf { width:100%; left:0; }
+  .menu__stage--live.is-closed { transform:rotateX(0) rotateY(0); }
+  .guide__leaf.is-turned { transform:rotateY(-180deg); visibility:hidden; }
+  .guide__leaf.is-turning { visibility:visible; }
+  .guide__back { visibility:hidden; }
+  .menu__row { gap:12px; }
+  .menu__price { max-width:6.8rem; }
+  .menu__tour { font-size:1.65rem; }
+  .menu__count { display:none; }
+  .menu__cover::before { inset:18px 16px 18px 22px; }
+}
+@media (max-width:380px) {
+  .menu__row { grid-template-columns:minmax(0,1fr); gap:8px; }
+  .menu__price { max-width:none; text-align:left; }
+  .menu__sheet { padding:28px 23px; }
+  .menu__nav { gap:5px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .menu__stage--live,.guide__leaf,.guide__face::after { transition:none !important; }
+  .menu__stage--live { --book-rx:0deg !important; --book-ry:0deg !important; }
+}
+@media print {
+  .menu__index,.menu__pager,.guide__gesture { display:none !important; }
+  .guide__scene { perspective:none; clip-path:none; }
+  .menu__stage--live { transform:none !important; height:auto !important; }
+  .guide__leaf { position:static; transform:none !important; width:100%; height:auto; visibility:visible !important; }
+  .guide__face { position:static; height:auto; transform:none; box-shadow:none; margin-bottom:24px; break-inside:avoid; }
+  .guide__back { display:none; }
+}

@@ -2,6 +2,44 @@
 
 Static site. No build step — open `index.html`, or deploy the folder as-is.
 
+## Interactive guidebook
+
+The bottom menu is now a side-bound 3D guidebook. Its green, gold-lettered cover
+reads **Unscripted Travel / Guide Book** and reuses the photographed kraft texture.
+Desktop opens into a photographic left page and a readable menu on the right;
+mobile keeps one readable page. Open the cover, use Previous/Next or the journey
+index, drag/swipe horizontally, or use Left/Right, Page Up/Down, Home and End.
+Reduced-motion preferences skip the turn. With JavaScript off, all pages remain
+readable in order. The hero at the top of the site is unchanged.
+
+### Change prices and descriptions without editing code
+
+Open **`/guidebook-editor.html` on the hosted website**. Choose a page and update
+its title, duration, experience names, descriptions and prices. Cover details,
+the introduction and pricing note are editable too. Changes appear in the
+embedded book preview.
+
+1. Click **Download updated index.html** to save your draft.
+2. Upload that file to the repository root, replacing `index.html`, and commit.
+   The editor links to GitHub's upload page; GitHub requires your normal account
+   permissions. Your existing deployment workflow publishes the change.
+3. To resume a downloaded draft, use **Open a saved draft** in the editor.
+
+**The editor does not publish directly.** It has no backend, account system,
+public write endpoint, or embedded credentials. It is a draft/export tool; edits
+stay in the tab until downloaded. Anyone with the editor URL can draft a copy,
+but only authorized repository users can publish. The editor is marked noindex.
+
+The canonical menu is real HTML inside `#addon-stage` in `index.html` — no duplicate
+price data or stale no-JavaScript fallback. Exports modify only the approved text
+fields and keep the rest of the original site intact. Draft imports copy text only,
+never executable markup. The editor needs HTTP(S) to fetch the current source.
+
+`guidebook.css` owns the book styling; `guidebook.js` adds the turn interaction.
+Keep both beside `index.html`. `guidebook-editor.html` and `guidebook-editor.js`
+provide the editing workflow. All 12 original extras are retained; unconfirmed
+dummy prices were replaced with **On request**, not invented amounts.
+
 ## Before launch — what still needs real content
 
 | Where | What to replace |

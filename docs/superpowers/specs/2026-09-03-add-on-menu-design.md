@@ -1,5 +1,10 @@
 # The add-on menu — design
 
+> Historical brief. The September 2026 guidebook request supersedes the original
+> one-card/no-spread restriction below: the current book opens sideways into a
+> two-page desktop spread and uses one readable page on mobile. See the README's
+> Interactive guidebook section for the implementation and editing workflow.
+
 A paper menu that turns. One sheet per journey: the journey's name at the head,
 then the things you can add to it with prices beside them.
 
