@@ -2,7 +2,8 @@
 
 > Historical brief. The September 2026 guidebook request supersedes the original
 > one-card/no-spread restriction below: the current book opens sideways into a
-> two-page desktop spread and uses one readable page on mobile. See the README's
+> two-page spread on both desktop and mobile. Mobile fits the whole book to the
+> screen, with direct page taps/swipes and an optional full-size text view. See the README's
 > Interactive guidebook section for the implementation and editing workflow.
 
 A paper menu that turns. One sheet per journey: the journey's name at the head,

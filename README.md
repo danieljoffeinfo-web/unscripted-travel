@@ -7,7 +7,13 @@ Static site. No build step — open `index.html`, or deploy the folder as-is.
 The bottom menu is now a side-bound 3D guidebook. Its green, gold-lettered cover
 reads **Unscripted Travel / Guide Book** and reuses the photographed kraft texture.
 Desktop opens into a photographic left page and a readable menu on the right;
-mobile keeps one readable page. Open the cover, use Previous/Next or the journey
+mobile now preserves that same complete two-page spread, fitted to the screen.
+The closed cover fills the phone width and scales down into the open book.
+On phones, tap the right page to turn forward, tap the photograph to turn back,
+or swipe. No journey buttons or sticky toolbar appear above the mobile book.
+Use the discreet **Read this page** link below the spread for full-size text, or
+native pinch zoom. The text view has a Close control, Escape support and enquiry
+link; it does not replace the book. Open the cover, use Previous/Next or the journey
 index, drag/swipe horizontally, or use Left/Right, Page Up/Down, Home and End.
 Reduced-motion preferences skip the turn. With JavaScript off, all pages remain
 readable in order. The hero at the top of the site is unchanged.

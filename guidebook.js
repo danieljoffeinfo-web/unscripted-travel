@@ -24,7 +24,10 @@
   const scene = document.createElement('div');
   scene.className = 'guide__scene';
   stage.before(scene);
-  scene.append(stage);
+  const canvas = document.createElement('div');
+  canvas.className = 'guide__canvas';
+  scene.append(canvas);
+  canvas.append(stage);
 
   function textNode(tag, cls, value) {
     const node = document.createElement(tag);
@@ -76,11 +79,58 @@
   let drag = null;
   let suppressClickUntil = 0;
   let sizingPending = false;
-  let pageHeights = [];
+  let bookHeight = 580;
+  let displayScale = 1;
   const pager = book.querySelector('.menu__pager');
   const pricing = book.querySelector('.guide__pricing');
+  const gesture = book.querySelector('.guide__gesture');
   const label = i => i === 0 ? 'Front cover' : 'Page ' + i + ' of 3';
 
+  const mobileTools = document.createElement('div');
+  mobileTools.className = 'guide__mobile-tools';
+  const mobilePosition = textNode('span', '', 'Front cover');
+  mobilePosition.setAttribute('aria-live','polite');
+  const readButton = textNode('button', '', 'Read this page');
+  readButton.type = 'button';
+  mobileTools.append(mobilePosition, readButton);
+  scene.after(mobileTools);
+  const reader = document.createElement('dialog');
+  reader.className = 'guide__reader';
+  reader.setAttribute('aria-labelledby','guide-reader-title');
+  const readerHeader = document.createElement('div');
+  readerHeader.className = 'guide__reader-header';
+  const closeReader = textNode('button', '', 'Close');
+  closeReader.type = 'button';
+  readerHeader.append(textNode('p', '', 'Unscripted Travel Guide Book'),closeReader);
+  const readerContent = document.createElement('div');
+  readerContent.className = 'guide__reader-content';
+  reader.append(readerHeader,readerContent);
+  document.body.append(reader);
+  readButton.addEventListener('click', () => {
+    if (current === 0 || turning || typeof reader.showModal !== 'function') return;
+    const title = textNode('h2', '', cards[current].querySelector('.menu__tour').textContent);
+    title.id = 'guide-reader-title';
+    readerContent.replaceChildren(
+      cards[current].querySelector('.menu__len').cloneNode(true),
+      title,
+      cards[current].querySelector('.menu__rows').cloneNode(true),
+      textNode('p', '', pricing.textContent)
+    );
+    const enquire = textNode('a', 'guide__reader-enquire', 'Enquire about this journey');
+    enquire.href = '#enquire';
+    enquire.addEventListener('click', () => {
+      reader.close();
+      const about = document.getElementById('about');
+      if (about && !about.value.trim()) about.value = 'I’m interested in ' + title.textContent + '.';
+    });
+    readerContent.append(enquire);
+    reader.showModal();
+    reader.scrollTop = 0;
+  });
+  closeReader.addEventListener('click', () => reader.close());
+  reader.addEventListener('click', event => { if (event.target === reader) reader.close(); });
+
+  book.classList.add('is-enhanced');
   stage.classList.add('menu__stage--live', 'guide--instant');
   stage.setAttribute('role', 'group');
   stage.setAttribute('aria-roledescription', 'interactive guidebook');
@@ -91,12 +141,10 @@
 
   function update() {
     const held = document.activeElement;
-    // Keep controls above long phone pages, but preserve the desktop layout.
-    if (narrow.matches && pager.nextElementSibling !== scene) scene.before(pager);
-    else if (!narrow.matches && pricing.nextElementSibling !== pager) pricing.after(pager);
+    // Desktop navigation stays beneath the book; mobile uses the pages themselves.
+    if (pricing.nextElementSibling !== pager) pricing.after(pager);
     stage.classList.toggle('is-closed', current === 0);
     leaves.forEach((leaf, i) => {
-      leaf.classList.toggle('is-mobile-hidden', i !== current);
       leaf.classList.toggle('is-turned', i < current);
       leaf.style.zIndex = String(i < current ? i + 1 : leaves.length * 2 - i);
       const front = cards[i];
@@ -104,7 +152,7 @@
       front.setAttribute('aria-hidden', String(i !== current));
       const back = leaf.querySelector('.guide__back');
       if (back) {
-        const active = i === current - 1 && !narrow.matches;
+        const active = i === current - 1;
         back.inert = !active;
         back.setAttribute('aria-hidden', String(!active));
       }
@@ -117,16 +165,36 @@
     next.innerHTML = (current === 0 ? 'Open book' : 'Next') + ' <span class="menu__arrow" aria-hidden="true">›</span>';
     next.setAttribute('aria-label', current === 0 ? 'Open the guidebook' : 'Next page');
     position.textContent = label(current);
+    mobilePosition.textContent = label(current);
+    readButton.hidden = current === 0 || typeof reader.showModal !== 'function';
+    readButton.disabled = turning;
+    gesture.textContent = narrow.matches ? 'Tap a page or swipe to turn. Pinch to zoom.' : 'Drag a page, swipe, or use the arrows to turn.';
+  }
+
+  function fitSpread(page = current) {
+    if (!narrow.matches) {
+      displayScale = 1;
+      canvas.style.removeProperty('--spread-scale');
+      scene.style.removeProperty('height');
+      return;
+    }
+    // A 1000px desktop canvas preserves both halves and their typesetting.
+    // The closed cover is half that width, so it gets the full phone width.
+    const available = Math.max(1, scene.clientWidth - 28);
+    displayScale = Math.min(1, available / (page === 0 ? 500 : 1000));
+    canvas.style.setProperty('--spread-scale', String(displayScale));
+    scene.style.height = Math.ceil(bookHeight * displayScale + 40) + 'px';
   }
 
   function size() {
     if (turning || drag) { sizingPending = true; return; }
     sizingPending = false;
     stage.classList.add('guide--measure');
-    pageHeights = cards.map(card => Math.ceil(card.scrollHeight) + 2);
-    const height = narrow.matches ? pageHeights[current] : Math.ceil(Math.max(...[...stage.querySelectorAll('.guide__face')].map(face => face.scrollHeight))) + 2;
+    const height = Math.ceil(Math.max(...[...stage.querySelectorAll('.guide__face')].map(face => face.scrollHeight))) + 2;
     stage.classList.remove('guide--measure');
     stage.style.height = height + 'px';
+    bookHeight = height;
+    fitSpread();
   }
 
   function syncHash() {
@@ -160,9 +228,9 @@
     stage.setAttribute('aria-busy', 'true');
     const forward = target > current;
     const destination = current + (forward ? 1 : -1);
-    if (narrow.matches && pageHeights.length) stage.style.height = Math.max(pageHeights[current], pageHeights[destination]) + 'px';
+    fitSpread(destination);
     const leaf = leaves[forward ? current : destination];
-    leaves[destination].classList.remove('is-mobile-hidden');
+    readButton.disabled = true;
     leaf.classList.add('is-turning');
     leaf.style.zIndex = '20';
     if (current === 0 || destination === 0) stage.classList.toggle('is-closed', destination === 0);
@@ -174,7 +242,7 @@
   }
 
   function bringPageIntoView() {
-    if (narrow.matches && target !== current && scene.getBoundingClientRect().top < pager.offsetHeight + 16) {
+    if (narrow.matches && target !== current && scene.getBoundingClientRect().top < -24) {
       scene.scrollIntoView({block:'start', behavior:reduce.matches ? 'auto' : 'smooth'});
     }
   }
@@ -219,7 +287,6 @@
         drag.active = true;
         drag.forward = forward;
         drag.leaf = leaves[forward ? current : current - 1];
-        leaves[current + (forward ? 1 : -1)].classList.remove('is-mobile-hidden');
         drag.leaf.classList.add('is-turning');
         drag.leaf.style.transition = 'none';
         drag.leaf.style.zIndex = '20';
@@ -242,10 +309,12 @@
   }, {passive:true});
   stage.addEventListener('pointerleave', () => { resetTilt(); if (drag && !drag.active) cancelDrag(); });
   stage.addEventListener('pointerdown', event => {
+    // A second finger belongs to native pinch zoom, never to a page turn.
+    if (!event.isPrimary) { cancelDrag(); suppressClickUntil = Date.now() + 500; return; }
     if (turning || drag || !event.isPrimary || event.button !== 0 || event.target.closest('a,button,input,textarea')) return;
     resetTilt();
-    // Untransformed width is stable even after several pages have been turned.
-    drag = {id:event.pointerId, x:event.clientX, y:event.clientY, width:leaves[0].offsetWidth, active:false};
+    // Pointer coordinates are screen pixels, so account for the fitted canvas.
+    drag = {id:event.pointerId, x:event.clientX, y:event.clientY, width:leaves[0].offsetWidth * displayScale, active:false};
   });
   function cancelDrag() {
     if (!drag) return;
@@ -282,12 +351,19 @@
   stage.addEventListener('lostpointercapture', () => { if (drag) cancelDrag(); });
   stage.addEventListener('click', event => {
     if (Date.now() < suppressClickUntil) { event.preventDefault(); return; }
-    if (current === 0 && !event.target.closest('a,button')) goTo(1);
+    if (turning || event.target.closest('a,button')) return;
+    if (current === 0) { goTo(1); return; }
+    if (narrow.matches) {
+      const face = event.target.closest('.guide__face');
+      if (face?.classList.contains('guide__back')) goTo(current - 1);
+      else if (face?.classList.contains('guide__front')) goTo(current + 1);
+    }
   });
 
   update();
+  scene.classList.add('guide--instant');
   size();
-  requestAnimationFrame(() => stage.classList.remove('guide--instant'));
+  requestAnimationFrame(() => { stage.classList.remove('guide--instant'); scene.classList.remove('guide--instant'); });
   if (document.fonts) document.fonts.ready.then(size);
   let resizeTimer;
   addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { size(); if (!turning && !drag) update(); }, 120); }, {passive:true});
