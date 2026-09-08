@@ -8,6 +8,19 @@
   const importer = document.getElementById('import');
   const preview = document.getElementById('preview');
   const retry = document.getElementById('load-retry');
+  const workspace = document.querySelector('.workspace');
+  const viewSwitch = document.querySelector('.mobile-view-switch');
+  viewSwitch.hidden = false;
+  workspace.dataset.view = 'edit';
+  viewSwitch.querySelectorAll('button').forEach(button => button.addEventListener('click', () => {
+    workspace.dataset.view = button.dataset.view;
+    viewSwitch.querySelectorAll('button').forEach(control => control.setAttribute('aria-pressed', String(control === button)));
+    if (viewSwitch.getBoundingClientRect().top < 0) viewSwitch.scrollIntoView({block:'start'});
+    requestAnimationFrame(() => {
+      workspace.scrollIntoView({block:'start', behavior:'auto'});
+      sendPreview(false);
+    });
+  }));
   let source = null;
   let descriptors = [];
   let dirty = false;
@@ -116,9 +129,11 @@
     } catch (_) { setStatus('The preview could not open. Your edits can still be downloaded.',true); }
   });
   download.addEventListener('click', () => {
-    if (!source || !form.reportValidity()) return;
+    if (!source) return;
     const invalid = descriptors.find(item => (!item.key.endsWith('.note') && !item.node.textContent.trim()) || item.node.textContent.length > item.max);
     if (invalid) {
+      workspace.dataset.view='edit';
+      viewSwitch.querySelectorAll('button').forEach(control => control.setAttribute('aria-pressed', String(control.dataset.view === 'edit')));
       select.value=String(invalid.page); renderFields();
       document.getElementById(invalid.key).focus();
       setStatus('Please check: '+invalid.label+'.',true); return;

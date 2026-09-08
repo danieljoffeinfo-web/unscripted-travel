@@ -1,12 +1,12 @@
 /* A real side-bound object: rigid cover, paper leaves, visible reverse faces.
    The texture is the client's existing photographed paper, not a new dependency. */
-.menu { --book-green:#293b30; --book-paper:#f5efe3; --book-gold:#e4cb91; }
+.menu { --book-green:#293b30; --book-paper:#f5efe3; --book-gold:#e4cb91; --guide-min-height:var(--guide-min-height); }
 .menu__book { max-width:1080px; margin:48px auto 0; }
 .menu__index { display:flex; flex-wrap:wrap; justify-content:center; gap:8px 20px; margin:0 0 34px; }
 .menu__tab { padding:10px 2px; color:var(--ink-soft); font-size:.875rem; text-decoration:none; border-bottom:1px solid transparent; }
 .menu__tab:hover,.menu__tab[aria-current] { color:var(--ink); border-color:var(--gold); }
 .menu__sheet { position:relative; padding:36px; background:var(--book-paper); border:1px solid #c9c0ae; margin:0 0 24px; overflow-wrap:anywhere; scroll-margin-top:32px; }
-.menu__cover { min-height:580px; display:flex; flex-direction:column; justify-content:space-between; color:#f6efdf; text-align:center; border-radius:3px 9px 9px 3px; border:1px solid #203025;
+.menu__cover { min-height:var(--guide-min-height); display:flex; flex-direction:column; justify-content:space-between; color:#f6efdf; text-align:center; border-radius:3px 9px 9px 3px; border:1px solid #203025;
   background-color:var(--book-green);
   background-image:linear-gradient(90deg,#101b179c,transparent 3%,#ffffff17 4%,#0718104d 6%,transparent 9%,#00000010 97%,#ffffff19),linear-gradient(#293b30e6,#25392feb),url('assets/kraft-tile.jpg');
   background-size:100% 100%,100% 100%,200px 200px;
@@ -45,7 +45,7 @@
 
 /* Upgrade only after the complete accessible book has been assembled. */
 .guide__scene { perspective:2200px; perspective-origin:50% 42%; padding:12px 0 18px; }
-.menu__stage--live { position:relative; min-height:580px; transform-style:preserve-3d; transform:translateX(0) rotateX(var(--book-rx,0deg)) rotateY(var(--book-ry,0deg)); transition:transform 850ms cubic-bezier(.25,.65,.2,1); touch-action:pan-y pinch-zoom; }
+.menu__stage--live { position:relative; min-height:var(--guide-min-height); transform-style:preserve-3d; transform:translateX(0) rotateX(var(--book-rx,0deg)) rotateY(var(--book-ry,0deg)); transition:transform 850ms cubic-bezier(.25,.65,.2,1); touch-action:pan-y pinch-zoom; }
 .menu__stage--live.is-closed { transform:translateX(-25%) rotateX(var(--book-rx,0deg)) rotateY(var(--book-ry,-5deg)); }
 .menu__stage--live:focus-visible { outline:2px solid var(--gold); outline-offset:12px; }
 .guide__leaf { position:absolute; left:50%; top:0; width:50%; height:100%; transform-origin:left center; transform-style:preserve-3d; transform:rotateY(0deg); transition:transform 850ms cubic-bezier(.25,.65,.2,1); }
@@ -61,28 +61,43 @@
 .guide__photo figcaption { display:block; border:0; padding:18px 0 0; color:#354536; font-size:1rem; }
 .guide__photo figcaption span { display:block; font-family:var(--mono); font-size:.75rem; margin-top:8px; text-transform:uppercase; letter-spacing:.12em; color:#59604e; }
 .guide__back-label { margin:0 0 20px; font-family:var(--mono); font-size:.75rem; letter-spacing:.12em; text-transform:uppercase; color:#59604e; }
-.guide--measure .guide__face { height:auto; min-height:580px; bottom:auto; }
+.guide--measure .guide__face { height:auto; min-height:var(--guide-min-height); bottom:auto; }
 .guide--measure .guide__photo img { flex:none; }
 .guide--instant,.guide--instant .guide__leaf { transition:none !important; }
 
-@media (max-width:760px) {
-  .menu__book { margin-top:30px; }
-  .menu__index { gap:0 16px; justify-content:flex-start; margin-bottom:23px; }
-  .menu__tab { font-size:.875rem; }
+@media (max-width:900px) {
+  .menu { --guide-min-height:460px; }
+  .menu__book { margin-top:24px; max-width:580px; min-width:0; }
+  .menu__index { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; margin-bottom:16px; }
+  .menu__tab { display:flex; align-items:center; justify-content:center; text-align:center; min-height:48px; padding:10px 9px; font-size:.875rem; line-height:1.4; border:1px solid #b3ad9f; overflow-wrap:anywhere; }
+  .menu__tab[aria-current] { background:var(--book-green); color:var(--book-paper); border-color:var(--book-green); }
   .menu__sheet,.guide__back { padding:30px 24px; }
-  .menu__cover { padding:36px 30px; }
+  .menu__cover { padding:30px; }
+  .guide__lockup { padding:32px 0; }
+  .guide__edition { letter-spacing:.08em; }
+  .guide__cover-foot p { margin-bottom:12px; }
+  .guide__open { min-height:48px; }
   .guide__brand { font-size:clamp(1.8rem,7vw,2.8rem); }
-  .guide__scene { clip-path:inset(-32px -16px -44px -16px); }
+  .guide__scene { clip-path:inset(-16px -12px -24px -12px); scroll-margin-top:100px; }
   .guide__leaf { width:100%; left:0; }
-  .menu__stage--live.is-closed { transform:rotateX(0) rotateY(0); }
+  .menu__stage--live,.menu__stage--live.is-closed { transform:none; }
   .guide__leaf.is-turned { transform:rotateY(-180deg); visibility:hidden; }
+  .guide__leaf.is-mobile-hidden { visibility:hidden; }
   .guide__leaf.is-turning { visibility:visible; }
   .guide__back { visibility:hidden; }
-  .menu__row { gap:12px; }
-  .menu__price { max-width:6.8rem; }
+  .menu__row { grid-template-columns:minmax(0,1fr); gap:10px; padding:17px 0; }
+  .menu__rows { margin:20px 0; }
+  .menu__price { max-width:none; text-align:left; font-size:1rem; }
   .menu__tour { font-size:1.65rem; }
   .menu__count { display:none; }
   .menu__cover::before { inset:18px 16px 18px 22px; }
+  .guide__page-foot { flex-wrap:wrap; gap:8px; }
+  .guide__page-foot a { display:flex; align-items:center; min-height:48px; font-size:1rem; }
+  .menu__pager { position:sticky; top:max(8px,env(safe-area-inset-top)); z-index:30; display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); max-width:none; margin:0 0 12px; padding:6px; gap:6px; background:#f2ede3; border:1px solid #b3ad9f; border-radius:3px; box-shadow:0 3px 12px #29352b14; }
+  .menu__nav { justify-content:center; min-height:48px; padding:8px 4px; gap:6px; line-height:1.3; }
+  .guide__position { max-width:70px; line-height:1.4; }
+  .guide__pricing { margin-top:24px; text-align:left; }
+  .guide__gesture { text-align:left; }
 }
 @media (max-width:380px) {
   .menu__row { grid-template-columns:minmax(0,1fr); gap:8px; }

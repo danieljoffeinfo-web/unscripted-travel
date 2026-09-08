@@ -13,7 +13,7 @@
   if (cards.length !== 4 || tabs.length !== cards.length || !prev || !next) return;
 
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
-  const narrow = matchMedia('(max-width: 760px)');
+  const narrow = matchMedia('(max-width: 900px)');
   const fine = matchMedia('(pointer: fine)');
   const DURATION = 850;
   const photos = [
@@ -76,6 +76,9 @@
   let drag = null;
   let suppressClickUntil = 0;
   let sizingPending = false;
+  let pageHeights = [];
+  const pager = book.querySelector('.menu__pager');
+  const pricing = book.querySelector('.guide__pricing');
   const label = i => i === 0 ? 'Front cover' : 'Page ' + i + ' of 3';
 
   stage.classList.add('menu__stage--live', 'guide--instant');
@@ -88,8 +91,12 @@
 
   function update() {
     const held = document.activeElement;
+    // Keep controls above long phone pages, but preserve the desktop layout.
+    if (narrow.matches && pager.nextElementSibling !== scene) scene.before(pager);
+    else if (!narrow.matches && pricing.nextElementSibling !== pager) pricing.after(pager);
     stage.classList.toggle('is-closed', current === 0);
     leaves.forEach((leaf, i) => {
+      leaf.classList.toggle('is-mobile-hidden', i !== current);
       leaf.classList.toggle('is-turned', i < current);
       leaf.style.zIndex = String(i < current ? i + 1 : leaves.length * 2 - i);
       const front = cards[i];
@@ -116,9 +123,10 @@
     if (turning || drag) { sizingPending = true; return; }
     sizingPending = false;
     stage.classList.add('guide--measure');
-    const height = Math.ceil(Math.max(580, ...[...stage.querySelectorAll('.guide__face')].map(face => face.scrollHeight)));
+    pageHeights = cards.map(card => Math.ceil(card.scrollHeight) + 2);
+    const height = narrow.matches ? pageHeights[current] : Math.ceil(Math.max(...[...stage.querySelectorAll('.guide__face')].map(face => face.scrollHeight))) + 2;
     stage.classList.remove('guide--measure');
-    stage.style.height = height + 2 + 'px';
+    stage.style.height = height + 'px';
   }
 
   function syncHash() {
@@ -136,7 +144,7 @@
     stage.removeAttribute('aria-busy');
     update();
     syncHash();
-    if (sizingPending) size();
+    if (sizingPending || narrow.matches) size();
     if (target !== current) turn();
   }
 
@@ -144,7 +152,7 @@
     if (turning || target === current) return;
     if (reduce.matches) {
       stage.classList.add('guide--instant');
-      current = target; update(); syncHash();
+      current = target; update(); syncHash(); size();
       requestAnimationFrame(() => stage.classList.remove('guide--instant'));
       return;
     }
@@ -152,7 +160,9 @@
     stage.setAttribute('aria-busy', 'true');
     const forward = target > current;
     const destination = current + (forward ? 1 : -1);
+    if (narrow.matches && pageHeights.length) stage.style.height = Math.max(pageHeights[current], pageHeights[destination]) + 'px';
     const leaf = leaves[forward ? current : destination];
+    leaves[destination].classList.remove('is-mobile-hidden');
     leaf.classList.add('is-turning');
     leaf.style.zIndex = '20';
     if (current === 0 || destination === 0) stage.classList.toggle('is-closed', destination === 0);
@@ -163,9 +173,16 @@
     turnTimer = setTimeout(() => finish(leaf, destination), DURATION + 40);
   }
 
+  function bringPageIntoView() {
+    if (narrow.matches && target !== current && scene.getBoundingClientRect().top < pager.offsetHeight + 16) {
+      scene.scrollIntoView({block:'start', behavior:reduce.matches ? 'auto' : 'smooth'});
+    }
+  }
+
   function goTo(index) {
     if (drag) cancelDrag();
     target = Math.max(0, Math.min(cards.length - 1, index));
+    bringPageIntoView();
     // A focused cover link must not become stranded in an inert face.
     if (cards.some(card => card.contains(document.activeElement))) stage.focus({preventScroll:true});
     turn();
@@ -202,6 +219,7 @@
         drag.active = true;
         drag.forward = forward;
         drag.leaf = leaves[forward ? current : current - 1];
+        leaves[current + (forward ? 1 : -1)].classList.remove('is-mobile-hidden');
         drag.leaf.classList.add('is-turning');
         drag.leaf.style.transition = 'none';
         drag.leaf.style.zIndex = '20';
@@ -226,7 +244,8 @@
   stage.addEventListener('pointerdown', event => {
     if (turning || drag || !event.isPrimary || event.button !== 0 || event.target.closest('a,button,input,textarea')) return;
     resetTilt();
-    drag = {id:event.pointerId, x:event.clientX, y:event.clientY, width:leaves[0].getBoundingClientRect().width, active:false};
+    // Untransformed width is stable even after several pages have been turned.
+    drag = {id:event.pointerId, x:event.clientX, y:event.clientY, width:leaves[0].offsetWidth, active:false};
   });
   function cancelDrag() {
     if (!drag) return;
@@ -253,6 +272,7 @@
     drag = null;
     if (stage.hasPointerCapture(ended.id)) stage.releasePointerCapture(ended.id);
     target = current + (ended.forward ? 1 : -1);
+    bringPageIntoView();
     if (reduce.matches) {
       ended.leaf.style.removeProperty('transition'); ended.leaf.style.removeProperty('transform'); ended.leaf.classList.remove('is-turning');
     }
@@ -272,6 +292,13 @@
   let resizeTimer;
   addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { size(); if (!turning && !drag) update(); }, 120); }, {passive:true});
   stage.querySelectorAll('img').forEach(img => img.addEventListener('load', size));
+  if ('ResizeObserver' in window) {
+    let lastWidth = 0;
+    new ResizeObserver(entries => {
+      const width = entries[0].contentRect.width;
+      if (width > 0 && width !== lastWidth) { lastWidth = width; size(); }
+    }).observe(scene);
+  }
 
   // The separate editor may preview text changes. It has no live-site write API.
   addEventListener('message', event => {

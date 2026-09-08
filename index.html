@@ -162,7 +162,7 @@ img{ max-width:100%; display:block; }
   background:url(assets/kraft-tile.jpg) 0 0/30.7692vw repeat, var(--kraft);
   /* vertical panning still scrolls the page; horizontal is ours, so a touch
      drag scrubs the wipe instead of being cancelled by the scroller */
-  touch-action:pan-y;
+  touch-action:pan-y pinch-zoom;
 }
 .hero__art{
   position:relative;
@@ -473,6 +473,30 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
   .js .reveal .rule,.js .reveal.is-in .rule{ transform:none; transition:none; }
   .journey::after{ transition:none; }
 }
+/* Phone/tablet refinements: retain navigation and allow long captions to wrap. */
+@media (max-width:960px) {
+  .nav { flex-wrap:wrap; gap:10px; padding:18px var(--gut); }
+  .nav__mark { font-size:.875rem; letter-spacing:.18em; min-height:44px; display:flex; align-items:center; }
+  .nav nav { width:100%; min-width:0; }
+  .nav__links { display:flex; gap:8px 20px; flex-wrap:wrap; }
+  .nav__links a { display:flex; align-items:center; min-height:44px; font-size:.875rem; letter-spacing:.08em; padding:4px 0; }
+}
+@media (max-width:760px) {
+  :root { --section:64px; }
+  .nav__links { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 12px; }
+  .nav { gap:0; }
+  .hero__stage { min-height:100svh; }
+  .js .hero { height:150svh; }
+  .hero__art { margin-top:70px; }
+  .capline { flex-wrap:wrap; gap:5px 12px; }
+  figcaption .coord { white-space:normal; }
+  .journey__cta { min-height:44px; display:inline-flex; align-items:center; }
+  .footer a { display:inline-block; min-height:44px; padding:6px 0; overflow-wrap:anywhere; }
+  .footer__base { overflow-wrap:anywhere; }
+  .field input,.field textarea,.field select { font-size:16px; min-height:48px; }
+  .btn { min-height:48px; }
+}
+@media (max-width:760px) and (prefers-reduced-motion:reduce) { .js .hero { height:auto; } }
 </style>
 <link rel="stylesheet" href="guidebook.css">
 </head>
