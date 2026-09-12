@@ -9,14 +9,30 @@ reads **Unscripted Travel / Guide Book** and reuses the photographed kraft textu
 Desktop opens into a photographic left page and a readable menu on the right;
 mobile now preserves that same complete two-page spread, fitted to the screen.
 The closed cover fills the phone width and scales down into the open book.
-On phones, tap the right page to turn forward, tap the photograph to turn back,
-or swipe. No journey buttons or sticky toolbar appear above the mobile book.
+On phones, swipe to turn, tap the photograph to turn back, or tap a page's
+heading to turn forward — tapping an extra ticks it instead. No journey buttons
+or sticky toolbar appear above the mobile book.
 Use the discreet **Read this page** link below the spread for full-size text, or
 native pinch zoom. The text view has a Close control, Escape support and enquiry
 link; it does not replace the book. Open the cover, use Previous/Next or the journey
 index, drag/swipe horizontally, or use Left/Right, Page Up/Down, Home and End.
 Reduced-motion preferences skip the turn. With JavaScript off, all pages remain
 readable in order. The hero at the top of the site is unchanged.
+
+### Build your tour
+
+Every extra in the book has a tick box — click or tap anywhere on its row. The
+enquiry form carries the same choices under **Build your tour**: those 12 extras,
+plus the seven highlights from Experiences. An extra ticked in the book is ticked
+in the form and the other way round, including from **Read this page** on a
+phone. Nothing is required, only a name and an email as before, and the free-text
+box stays for anything not on the list.
+
+Both lists are read off the page as it loads — the plate names and the book's own
+rows — so renaming an extra in the editor renames its tick box too and there is
+no second copy to maintain. Ticks leave with the enquiry: as `highlights` and
+`extras` arrays when `FORM_ENDPOINT` is set, or as a **Build your tour** block in
+the pre-filled email when it is not.
 
 ### Change prices and descriptions without editing code
 
@@ -125,7 +141,12 @@ the book and the area its shadow falls into are excluded — and divides it out,
 then scales the result back to the sheet's own mean colour. Clean paper lands
 on one flat kraft; the shadow, being a ratio below the field, keeps its
 falloff. The book itself is untouched. After it runs the two edges differ by
-1.6 levels (wide) and 2.2 (tight), down from thirteen.
+1.6 levels (wide) and 2.5 (tight), down from thirteen.
+
+Pass a tone to re-tint the sheet. It was lifted a few shades in September 2026,
+from `#BC9C70` to `#CAB290`, with `python3 tools/flatten-kraft.py '#CBB290'`:
+paper and its shadow scale onto the new tone together, so the shadow keeps its
+falloff and the book stays exactly as shot.
 
 Three things follow from it, and the script prints all of them:
 

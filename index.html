@@ -10,7 +10,7 @@
 <meta property="og:description" content="Bespoke Cape Town travel. We build the days around you.">
 <meta property="og:image" content="assets/booklet-wide.jpg">
 <meta property="og:type" content="website">
-<meta name="theme-color" content="#C4A375">
+<meta name="theme-color" content="#D2B995">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23454A35'/%3E%3Crect x='7' y='15' width='18' height='1.6' fill='%23D8BC7C'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,7 +32,7 @@
   --ink-faint:#606558;   /* 5.1:1 on cream, 4.7:1 on the band */
   --cream:#F2EDE3;      /* the page */
   --cream-2:#E9E2D4;    /* the one recessed band */
-  --kraft:#BC9C70;      /* the photographed sheet, flattened to one tone */
+  --kraft:#CAB290;      /* the photographed sheet, flattened to one tone */
   --cover:#454A35;
   --cover-lit:#565C47;
   --sage:#55654B;       /* display titles on light grounds — 5.37:1 on cream */
@@ -410,6 +410,65 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
 .form__note{ margin:20px 0 0; font-size:.8rem; color:rgba(242,237,227,.5); }
 .form__status{ margin:20px 0 0; font-size:.9rem; min-height:1.4em; color:var(--gold-lit); }
 
+/* ── Build your tour — optional ticks, read off the page itself: the Experiences
+      plates above and the guide book's own rows. Ticking one of a pair ticks the
+      other. Gold stays a hairline here too — the box edge and the tick, never a
+      fill. The lists are built by the script, so the markup ships empty. ── */
+.tour{ border:0; margin:0; padding:0; min-width:0; }
+.field-row + .tour{ margin-top:clamp(22px,2.6vw,32px); }
+.tour + .field{ margin-top:clamp(26px,3.2vw,38px); }
+.tour legend{
+  padding:0; margin-bottom:10px;
+  font-weight:500; font-size:.62rem; letter-spacing:.28em;
+  text-transform:uppercase; color:rgba(242,237,227,.6);
+}
+.tour__lede{ margin:0; max-width:56ch; font-size:.92rem; color:rgba(242,237,227,.72); }
+.tour__group{ margin-top:clamp(18px,2.2vw,26px); }
+.tour__head{
+  display:flex; justify-content:space-between; align-items:baseline; gap:16px;
+  margin:0; padding-bottom:10px; border-bottom:1px solid rgba(216,188,124,.3);
+  font-family:var(--mono); font-size:.62rem; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--meta-c);
+}
+.tour__head a{
+  color:var(--cream); text-decoration:none; white-space:nowrap;
+  border-bottom:1px solid rgba(242,237,227,.4); transition:border-color .25s ease;
+}
+.tour__head a:hover,.tour__head a:focus-visible{ border-bottom-color:var(--gold-lit); }
+.tour__list{
+  list-style:none; margin:2px 0 0; padding:0;
+  display:grid; grid-template-columns:1fr; column-gap:40px;
+}
+@media (min-width:640px){ .tour__list{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
+.tour__opt{
+  position:relative; display:grid; grid-template-columns:18px minmax(0,1fr); gap:14px;
+  align-items:start; padding:9px 0; cursor:pointer;
+  font-size:.95rem; line-height:1.45; color:var(--cream);
+}
+/* The real control keeps the keyboard and the accessibility tree; the box beside
+   it is what you see, which is what lets the tick be drawn on. */
+.tour__opt input{
+  position:absolute; left:0; top:11px; width:18px; height:18px; margin:0;
+  opacity:0; pointer-events:none;
+}
+.tour__box{
+  width:18px; height:18px; margin-top:2px;
+  border:1px solid rgba(242,237,227,.5); color:var(--gold-lit);
+  transition:border-color .25s ease;
+}
+.tour__box svg{
+  display:block; width:100%; height:100%;
+  fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;
+  stroke-dasharray:16; stroke-dashoffset:16;
+  transition:stroke-dashoffset .3s cubic-bezier(.3,.7,.2,1);
+}
+.tour__opt input:checked + .tour__box{ border-color:var(--gold-lit); }
+.tour__opt input:checked + .tour__box svg{ stroke-dashoffset:0; }
+.tour__opt input:focus-visible + .tour__box{ outline:2px solid var(--gold-lit); outline-offset:3px; }
+@media (hover:hover){ .tour__opt:hover .tour__box{ border-color:rgba(242,237,227,.85); } }
+@media (max-width:760px){ .tour__opt{ min-height:44px; padding-block:11px; } }
+@media (prefers-reduced-motion:reduce){ .tour__box svg{ transition:none; } }
+
 /* ── Footer — the book closes ── */
 .footer{
   background:var(--cover-lit); color:var(--cream);
@@ -672,7 +731,7 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
         <p class="eyebrow">Add to any journey<span class="idx">04 / 05</span></p>
         <h2 class="title">The guide book</h2>
         <hr class="rule">
-        <p class="lede" data-guide-intro>A few ways to make the journey yours. Open the book and explore the extras — the trip itself is shaped once we've spoken.</p>
+        <p class="lede" data-guide-intro>A few ways to make the journey yours. Open the book and tick anything you would like built in — it comes through with your enquiry. The trip itself is shaped once we've spoken.</p>
       </div>
 
       <div class="menu__book">
@@ -821,7 +880,7 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
           <span class="guide__position" aria-live="polite" aria-atomic="true">Front cover</span>
           <button type="button" class="menu__nav menu__next" aria-label="Next page">Next <span class="menu__arrow" aria-hidden="true">&rsaquo;</span></button>
         </div>
-        <p class="guide__gesture" hidden>Drag a page, swipe, or use the arrows to turn.</p>
+        <p class="guide__gesture" hidden>Drag a page, swipe, or use the arrows to turn. Click an extra to tick it.</p>
       </div>
     </div>
   </section>
@@ -874,6 +933,22 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
             </select>
           </div>
         </div>
+
+        <!-- Build your tour. Both lists are filled in by the script — the
+             Experiences plates above and the guide book's own rows — so there is
+             one copy of each name to maintain. Every tick is optional. -->
+        <fieldset class="tour" id="build-tour" hidden>
+          <legend>Build your tour</legend>
+          <p class="tour__lede">Tick anything you would love built in. It is optional, and a starting point rather than a limit — anything else goes in the box below.</p>
+          <div class="tour__group">
+            <p class="tour__head"><span>Cape Town highlights</span></p>
+            <ul class="tour__list" data-tour="highlights"></ul>
+          </div>
+          <div class="tour__group">
+            <p class="tour__head"><span>Extras from the guide book</span><a href="#add-ons">Open the book</a></p>
+            <ul class="tour__list" data-tour="extras"></ul>
+          </div>
+        </fieldset>
 
         <div class="field">
           <label for="about">What would make this trip worth it</label>
@@ -1022,13 +1097,114 @@ document.querySelectorAll('.reveal').forEach((el, i) => {
 
 /* The guidebook is progressively enhanced by guidebook.js. */
 
+/* ── Build your tour ──────────────────────────────────────────────
+   One answer to "what would you like included", offered in two places: a tick
+   box on every extra in the guide book, and the same extras in the enquiry form
+   beside the Experiences highlights. Ticking either one of a pair ticks the
+   other, so there is only ever one list to send.
+   Both lists are read off the page, so renaming an extra in the editor renames
+   its tick box with it — there is no second copy of the names here.
+   Nothing is required: the form still asks only for a name and an email.
+   This runs before guidebook.js, which then assembles the book with the tick
+   boxes already sitting in its rows. ── */
+(function () {
+  const tour  = document.getElementById('build-tour');
+  const stage = document.getElementById('addon-stage');
+  if (!tour) return;
+
+  /* drawn rather than a native box, so the tick can be stroked on */
+  const TICK = '<svg viewBox="0 0 18 18" aria-hidden="true" focusable="false">' +
+               '<path d="M4 9.6l3.3 3.2 6.7-7.3"/></svg>';
+  function drawnBox(cls) {
+    const box = document.createElement('span');
+    box.className = cls;
+    box.setAttribute('aria-hidden', 'true');
+    box.innerHTML = TICK;
+    return box;
+  }
+
+  function option(list, group, value) {
+    const input = document.createElement('input');
+    input.type = 'checkbox'; input.name = group; input.value = value;
+    const text = document.createElement('span');
+    text.textContent = value;
+    const label = document.createElement('label');
+    label.className = 'tour__opt';
+    label.append(input, drawnBox('tour__box'), text);
+    const item = document.createElement('li');
+    item.append(label);
+    list.append(item);
+    return input;
+  }
+
+  document.querySelectorAll('.plates figcaption .name').forEach((plate) => {
+    option(tour.querySelector('[data-tour="highlights"]'), 'highlights', plate.textContent.trim());
+  });
+
+  const extras = tour.querySelector('[data-tour="extras"]');
+  const ticks = [];
+
+  const tally = document.createElement('p');
+  tally.className = 'guide__tally';
+  const tallyCount = document.createElement('span');
+  tallyCount.setAttribute('aria-live', 'polite');
+  const tallyLink = document.createElement('a');
+  tallyLink.href = '#build-tour';
+  tallyLink.textContent = 'See your tour ↓';
+  tally.append(tallyCount, tallyLink);
+
+  function paint() {
+    const n = ticks.filter((tick) => tick.checked).length;
+    tallyCount.textContent = n
+      ? n + (n === 1 ? ' extra' : ' extras') + ' ticked for your tour'
+      : 'Tick any extra to add it to your enquiry.';
+    tallyLink.hidden = !n;
+  }
+
+  (stage ? stage.querySelectorAll('.menu__row') : []).forEach((row, i) => {
+    const name = row.querySelector('.menu__name');
+    const note = row.querySelector('.menu__note');
+    if (!name) return;
+    const inForm = option(extras, 'extras', name.textContent.trim());
+
+    /* In the book the whole row is the target. The name labels the box and the
+       note describes it, so a screen reader announces the extra rather than
+       reading the row back in full. */
+    const inBook = document.createElement('input');
+    inBook.type = 'checkbox';
+    inBook.className = 'menu__tick';
+    name.id = 'extra-' + i;
+    inBook.setAttribute('aria-labelledby', name.id);
+    if (note) {
+      note.id = 'extra-note-' + i;
+      inBook.setAttribute('aria-describedby', note.id);
+    }
+    const pick = document.createElement('label');
+    pick.className = 'menu__pick';
+    pick.append(inBook, drawnBox('menu__box'), ...Array.from(row.childNodes));
+    row.append(pick);
+
+    inBook.addEventListener('change', () => { inForm.checked = inBook.checked; paint(); });
+    inForm.addEventListener('change', () => { inBook.checked = inForm.checked; paint(); });
+    ticks.push(inBook);
+  });
+
+  if (ticks.length) stage.after(tally);
+  paint();
+  tour.hidden = false;
+})();
+
 /* Enquiry form */
 const form = document.getElementById('enquiry');
 const status = document.getElementById('status');
 
 form.addEventListener('submit', async (ev) => {
   ev.preventDefault();
-  const data = Object.fromEntries(new FormData(form).entries());
+  const fd = new FormData(form);
+  const data = Object.fromEntries(fd.entries());
+  /* Build your tour: many ticks under one name each, so they travel as lists */
+  data.highlights = fd.getAll('highlights');
+  data.extras = fd.getAll('extras');
 
   if (!data.name.trim() || !data.email.trim()) {
     status.textContent = 'Please add your name and email.';
@@ -1046,8 +1222,14 @@ form.addEventListener('submit', async (ev) => {
   status.textContent = 'Sending…';
 
   if (!FORM_ENDPOINT) {
+    const tour = [
+      data.highlights.length ? 'Highlights: ' + data.highlights.join(', ') : '',
+      data.extras.length ? 'Extras:\n' + data.extras.map((x) => '- ' + x).join('\n') : ''
+    ].filter(Boolean).join('\n');
     const body = `Name: ${data.name}\nEmail: ${data.email}\nDates: ${data.dates || '—'}\n` +
-                 `Who: ${data.party}\n\n${data.about || ''}`;
+                 `Who: ${data.party}\n\n` +
+                 (tour ? `Build your tour\n${tour}\n\n` : '') +
+                 (data.about || '');
     window.location.href = `mailto:${CONTACT_EMAIL}` +
       `?subject=${encodeURIComponent('Trip enquiry — ' + data.name)}` +
       `&body=${encodeURIComponent(body)}`;

@@ -31,6 +31,23 @@
 .menu__name { display:block; color:#29352b; font-weight:500; font-size:1rem; line-height:1.4; }
 .menu__note { display:block; margin-top:7px; color:#5b6053; font-size:1rem; line-height:1.55; }
 .menu__price { max-width:8rem; font-family:var(--mono); font-size:.875rem; font-variant-numeric:tabular-nums; letter-spacing:0; color:#354536; white-space:normal; text-align:right; line-height:1.5; }
+
+/* Build your tour: every extra carries a tick box and the whole row is the
+   target. A pen tick on paper rather than a web control — no fill, square
+   corners. The same extras are listed in the enquiry form, and ticking either
+   one ticks the other. */
+.menu__row > .menu__pick { grid-column:1 / -1; }
+.menu__pick { position:relative; display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:baseline; gap:14px 16px; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+.menu__tick { position:absolute; left:0; top:2px; width:20px; height:20px; margin:0; opacity:0; pointer-events:none; }
+.menu__box { align-self:start; width:20px; height:20px; margin-top:1px; border:1px solid #7d8272; border-radius:1px; background:#fffdf7; color:#293b30; transition:border-color .2s ease; }
+.menu__box svg { display:block; width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:16; stroke-dashoffset:16; transition:stroke-dashoffset .3s cubic-bezier(.3,.7,.2,1); }
+.menu__tick:checked + .menu__box { border-color:#293b30; }
+.menu__tick:checked + .menu__box svg { stroke-dashoffset:0; }
+.menu__tick:focus-visible + .menu__box { outline:2px solid var(--gold); outline-offset:3px; }
+@media (hover:hover) { .menu__pick:hover .menu__box { border-color:#293b30; } }
+.guide__tally { margin:16px auto 0; text-align:center; font-size:.875rem; color:var(--ink-soft); }
+.guide__tally a { margin-left:12px; color:var(--ink); text-underline-offset:5px; }
+.guide__tally a[hidden] { display:none; }
 .guide__page-foot { margin-top:auto; border-top:1px solid #b09b7066; padding-top:16px; display:flex; align-items:center; justify-content:space-between; gap:15px; }
 .guide__page-foot span { font-family:var(--mono); font-size:.75rem; letter-spacing:.1em; text-transform:uppercase; color:#59604e; }
 .guide__page-foot a { color:#354536; font-size:.875rem; text-underline-offset:5px; }
@@ -85,6 +102,7 @@
   .menu__stage--live { --book-rx:0deg !important; --book-ry:0deg !important; }
   .guide__pricing { margin:24px auto 0; text-align:center; }
   .guide__gesture { max-width:32ch; margin:14px auto 0; text-align:center; }
+  .guide__tally { max-width:34ch; margin:14px auto 0; }
   .guide__mobile-tools { display:flex; align-items:center; justify-content:center; gap:20px; min-height:48px; font-size:.875rem; color:var(--ink-soft); }
   .guide__mobile-tools button { min-height:48px; padding:10px 0; border:0; background:none; color:var(--ink); font:inherit; text-decoration:underline; text-underline-offset:5px; cursor:pointer; }
   .guide__mobile-tools button[hidden] { display:none; }
@@ -100,6 +118,8 @@
 .guide__reader-content { padding:24px; }
 .guide__reader-content h2 { font-size:1.8rem; font-weight:400; line-height:1.3; margin:12px 0 24px; }
 .guide__reader .menu__row { grid-template-columns:minmax(0,1fr); gap:10px; }
+.guide__reader .menu__pick { grid-template-columns:auto minmax(0,1fr); gap:12px 14px; }
+.guide__reader .menu__price { grid-column:2; }
 .guide__reader .menu__price { max-width:none; text-align:left; font-size:1rem; }
 .guide__reader .menu__len { font-size:.875rem; }
 .guide__reader .menu__note,.guide__reader .menu__name { font-size:1rem; }
@@ -108,10 +128,11 @@
 @media (prefers-reduced-motion:reduce) {
   .guide__scene,.guide__canvas { transition:none !important; }
   .menu__stage--live,.guide__leaf,.guide__face::after { transition:none !important; }
+  .menu__box svg { transition:none !important; }
   .menu__stage--live { --book-rx:0deg !important; --book-ry:0deg !important; }
 }
 @media print {
-  .menu__index,.menu__pager,.guide__gesture,.guide__mobile-tools,.guide__reader { display:none !important; }
+  .menu__index,.menu__pager,.guide__gesture,.guide__mobile-tools,.guide__reader,.guide__tally { display:none !important; }
   .guide__scene { perspective:none; clip-path:none; }
   .guide__scene { height:auto !important; overflow:visible; }
   .guide__canvas { position:static; width:auto; transform:none; }

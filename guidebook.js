@@ -106,6 +106,27 @@
   readerContent.className = 'guide__reader-content';
   reader.append(readerHeader,readerContent);
   document.body.append(reader);
+  // The reading view's tick boxes are the book's own: ticking a copy ticks the
+  // row it was made from, which keeps the enquiry form in step as well.
+  function readableRows(rows) {
+    const copy = rows.cloneNode(true);
+    const originals = [...rows.querySelectorAll('.menu__tick')];
+    copy.querySelectorAll('[id]').forEach(node => node.removeAttribute('id'));
+    copy.querySelectorAll('.menu__tick').forEach((tick, i) => {
+      const original = originals[i];
+      if (!original) return;
+      tick.checked = original.checked;
+      tick.removeAttribute('aria-labelledby');
+      tick.removeAttribute('aria-describedby');
+      const name = tick.closest('.menu__row')?.querySelector('.menu__name');
+      if (name) tick.setAttribute('aria-label', name.textContent);
+      tick.addEventListener('change', () => {
+        original.checked = tick.checked;
+        original.dispatchEvent(new Event('change', {bubbles:true}));
+      });
+    });
+    return copy;
+  }
   readButton.addEventListener('click', () => {
     if (current === 0 || turning || typeof reader.showModal !== 'function') return;
     const title = textNode('h2', '', cards[current].querySelector('.menu__tour').textContent);
@@ -113,7 +134,7 @@
     readerContent.replaceChildren(
       cards[current].querySelector('.menu__len').cloneNode(true),
       title,
-      cards[current].querySelector('.menu__rows').cloneNode(true),
+      readableRows(cards[current].querySelector('.menu__rows')),
       textNode('p', '', pricing.textContent)
     );
     const enquire = textNode('a', 'guide__reader-enquire', 'Enquire about this journey');
@@ -168,7 +189,7 @@
     mobilePosition.textContent = label(current);
     readButton.hidden = current === 0 || typeof reader.showModal !== 'function';
     readButton.disabled = turning;
-    gesture.textContent = narrow.matches ? 'Tap a page or swipe to turn. Pinch to zoom.' : 'Drag a page, swipe, or use the arrows to turn.';
+    gesture.textContent = narrow.matches ? 'Swipe to turn. Tap an extra to tick it. Pinch to zoom.' : 'Drag a page, swipe, or use the arrows to turn. Click an extra to tick it.';
   }
 
   function fitSpread(page = current) {
@@ -348,10 +369,17 @@
     turn();
   });
   stage.addEventListener('pointercancel', cancelDrag);
-  stage.addEventListener('lostpointercapture', () => { if (drag) cancelDrag(); });
+  // A touch pointer is implicitly captured by whatever it landed on, so taking
+  // capture for the book fires a lost event for that first capture — a handover,
+  // not a loss. Only a pointer the book no longer holds ends the drag; treating
+  // the handover as a loss cancelled every swipe that began on a page.
+  stage.addEventListener('lostpointercapture', event => {
+    if (drag && !stage.hasPointerCapture(event.pointerId)) cancelDrag();
+  });
   stage.addEventListener('click', event => {
     if (Date.now() < suppressClickUntil) { event.preventDefault(); return; }
-    if (turning || event.target.closest('a,button')) return;
+    // A label is an extra's tick box: ticking one never turns the page.
+    if (turning || event.target.closest('a,button,label')) return;
     if (current === 0) { goTo(1); return; }
     if (narrow.matches) {
       const face = event.target.closest('.guide__face');

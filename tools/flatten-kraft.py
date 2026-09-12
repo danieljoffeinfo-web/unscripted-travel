@@ -63,7 +63,15 @@ def flatten(im, book, target=None):
     return Image.fromarray(out.astype(np.uint8)), lit, target
 
 
+# Pass a tone to re-tint the sheet — a few shades lighter, say:
+#     python3 tools/flatten-kraft.py '#CBB290'
+# Both crops are scaled onto it. Paper and shadow scale together, so the shadow
+# keeps its falloff; the book is untouched. Without one, the sheet keeps its own
+# mean colour.
 shared = None
+if len(sys.argv) > 1:
+    tone = sys.argv[1].lstrip('#')
+    shared = np.array([int(tone[i:i + 2], 16) for i in (0, 2, 4)], np.float64)
 for path, keep_h, book in CROPS:
     im = Image.open(path).convert('RGB')
     w, h = im.size
