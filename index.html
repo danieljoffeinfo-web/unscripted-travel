@@ -90,7 +90,6 @@ img{ max-width:100%; display:block; }
   width:clamp(60px,9vw,132px); height:1px; border:0; margin:1.4rem 0 0;
   background:var(--gold); opacity:.85;
 }
-.rule.center{ margin-inline:auto; }
 .lede{
   max-width:56ch; margin:1.6rem 0 0; color:var(--ink-soft);
   font-size:clamp(1.02rem,.98rem + .3vw,1.16rem);
@@ -113,8 +112,6 @@ img{ max-width:100%; display:block; }
 }
 
 .section{ padding-block:var(--section); }
-.head--center{ text-align:center; }
-.head--center .lede{ margin-inline:auto; }
 
 /* ── Nav — Kobu: small caps, wide tracking, hairline on hover, no fills ── */
 .nav{
@@ -352,19 +349,6 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
 
 /* The interactive guidebook is styled in guidebook.css. */
 
-/* ── Words (client supplies the real quote) ── */
-.words{ text-align:center; }
-.words blockquote{
-  margin:clamp(30px,4vw,52px) auto 0; max-width:30ch;
-  font-weight:300; font-size:clamp(1.25rem,1rem + 1.5vw,2rem);
-  line-height:1.5; text-wrap:balance;
-}
-.words cite{
-  display:block; margin-top:1.8rem; font-style:normal;
-  font-weight:500; font-size:.66rem; letter-spacing:.28em;
-  text-transform:uppercase; color:var(--ink-faint);
-}
-
 /* ── Enquiry ── */
 .enquire{ background:var(--cover); color:var(--cream); }
 .enquire{ --meta-c:rgba(242,237,227,.70); }   /* 5.00:1 on the cover ground */
@@ -523,7 +507,6 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
 .js .reveal.is-in{ opacity:1; transform:none; transition:opacity .7s ease,transform .7s ease; }
 /* the lockup's gold rule draws itself rather than fading in with the block */
 .js .reveal .rule{ transform:scaleX(0); transform-origin:left center; }
-.js .reveal .rule.center{ transform-origin:center; }
 .js .reveal.is-in .rule{
   transform:scaleX(1); transition:transform .9s cubic-bezier(.22,.61,.36,1) .12s;
 }
@@ -542,11 +525,14 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
 }
 @media (max-width:760px) {
   :root { --section:64px; }
-  .nav__links { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 12px; }
+  /* one row across the phone, rather than a 2x2 block of links */
+  .nav__links { display:flex; flex-wrap:nowrap; justify-content:space-between; gap:0 10px; width:100%; }
+  .nav__links a { font-size:clamp(.55rem,2.6vw,.68rem); letter-spacing:.1em; white-space:nowrap; }
   .nav { gap:0; }
   .hero__stage { min-height:100svh; }
-  .js .hero { height:150svh; }
-  .hero__art { margin-top:70px; }
+  /* was 150svh, which left a whole empty screen of paper to scroll past */
+  .js .hero { height:125svh; }
+  .hero__art { margin-top:56px; }
   .capline { flex-wrap:wrap; gap:5px 12px; }
   figcaption .coord { white-space:normal; }
   .journey__cta { min-height:44px; display:inline-flex; align-items:center; }
@@ -885,16 +871,6 @@ figcaption .note{ font-size:.85rem; color:var(--ink-soft); }
     </div>
   </section>
 
-  <!-- Words — REPLACE with a real client quote before launch -->
-  <section class="section words">
-    <div class="wrap reveal">
-      <p class="eyebrow">In their words</p>
-      <hr class="rule center">
-      <blockquote>&ldquo;Client testimonial goes here — a real quote, two or three lines.&rdquo;</blockquote>
-      <cite>Name, City — placeholder</cite>
-    </div>
-  </section>
-
   <!-- Enquiry -->
   <section class="section enquire" id="enquire">
     <div class="wrap">
@@ -1154,10 +1130,12 @@ document.querySelectorAll('.reveal').forEach((el, i) => {
   tally.append(tallyCount, tallyLink);
 
   function paint() {
+    /* The line appears only once something is ticked. The invitation to tick
+       belongs on the rows themselves and in the hint under the book — a phone
+       screen cannot carry four lines of small print under the spread. */
     const n = ticks.filter((tick) => tick.checked).length;
-    tallyCount.textContent = n
-      ? n + (n === 1 ? ' extra' : ' extras') + ' ticked for your tour'
-      : 'Tick any extra to add it to your enquiry.';
+    tally.hidden = !n;
+    tallyCount.textContent = n ? n + (n === 1 ? ' extra' : ' extras') + ' ticked for your tour' : '';
     tallyLink.hidden = !n;
   }
 

@@ -103,9 +103,17 @@
   .guide__pricing { margin:24px auto 0; text-align:center; }
   .guide__gesture { max-width:32ch; margin:14px auto 0; text-align:center; }
   .guide__tally { max-width:34ch; margin:14px auto 0; }
-  .guide__mobile-tools { display:flex; align-items:center; justify-content:center; gap:20px; min-height:48px; font-size:.875rem; color:var(--ink-soft); }
-  .guide__mobile-tools button { min-height:48px; padding:10px 0; border:0; background:none; color:var(--ink); font:inherit; text-decoration:underline; text-underline-offset:5px; cursor:pointer; }
+  /* The spread is necessarily small on a phone, so the full-size reading view is
+     a proper button under the book rather than a quiet link beside the page
+     number, and the small print below it is trimmed to two short lines. */
+  /* no min-height: the button carries its own 48px, so on the closed cover —
+     where there is no button — this collapses to one line instead of holding
+     an empty gap open under the book. */
+  .guide__mobile-tools { display:flex; flex-direction:column; align-items:center; gap:12px; font-size:.875rem; color:var(--ink-soft); }
+  .guide__mobile-tools button { min-height:48px; min-width:min(280px,100%); padding:14px 28px; border:1px solid rgba(42,46,38,.45); border-radius:0; background:none; color:var(--ink); font:inherit; font-weight:500; font-size:.68rem; letter-spacing:.2em; text-transform:uppercase; text-decoration:none; cursor:pointer; transition:background-color .25s ease,color .25s ease,border-color .25s ease; }
+  .guide__mobile-tools button:hover,.guide__mobile-tools button:focus-visible { background:var(--ink); color:var(--cream); border-color:var(--ink); }
   .guide__mobile-tools button[hidden] { display:none; }
+  .guide__pricing,.guide__gesture { font-size:.8rem; }
   .guide--instant.guide__scene,.guide--instant .guide__canvas { transition:none !important; }
 }
 

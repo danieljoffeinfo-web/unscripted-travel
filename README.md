@@ -12,8 +12,8 @@ The closed cover fills the phone width and scales down into the open book.
 On phones, swipe to turn, tap the photograph to turn back, or tap a page's
 heading to turn forward — tapping an extra ticks it instead. No journey buttons
 or sticky toolbar appear above the mobile book.
-Use the discreet **Read this page** link below the spread for full-size text, or
-native pinch zoom. The text view has a Close control, Escape support and enquiry
+Use the **Read this page** button below the spread for full-size text, or native
+pinch zoom. The text view has a Close control, Escape support and enquiry
 link; it does not replace the book. Open the cover, use Previous/Next or the journey
 index, drag/swipe horizontally, or use Left/Right, Page Up/Down, Home and End.
 Reduced-motion preferences skip the turn. With JavaScript off, all pages remain
@@ -67,7 +67,6 @@ dummy prices were replaced with **On request**, not invented amounts.
 | Where | What to replace |
 |---|---|
 | `assets/` | Nothing — all seven photographs are in. |
-| "In their words" section | The placeholder quote and attribution — currently marked `placeholder` on purpose. |
 | Footer | `hello@unscriptedtravel.co.za`, `+27 00 000 0000`, Instagram and WhatsApp links. |
 | `FORM_ENDPOINT` in the script | Enquiry destination. **Left empty it falls back to opening a pre-filled email**, so the form works either way. |
 

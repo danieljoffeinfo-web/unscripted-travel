@@ -189,7 +189,10 @@
     mobilePosition.textContent = label(current);
     readButton.hidden = current === 0 || typeof reader.showModal !== 'function';
     readButton.disabled = turning;
-    gesture.textContent = narrow.matches ? 'Swipe to turn. Tap an extra to tick it. Pinch to zoom.' : 'Drag a page, swipe, or use the arrows to turn. Click an extra to tick it.';
+    // On the closed cover there is nothing to tick yet, so say how to open it.
+    gesture.textContent = current === 0
+      ? (narrow.matches ? 'Tap the book to open it · swipe to turn' : 'Click the cover to open the book, then drag a page or use the arrows.')
+      : (narrow.matches ? 'Swipe to turn · tap to tick · pinch to zoom' : 'Drag a page, swipe, or use the arrows to turn. Click an extra to tick it.');
   }
 
   function fitSpread(page = current) {
