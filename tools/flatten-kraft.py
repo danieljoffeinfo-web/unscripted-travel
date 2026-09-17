@@ -23,8 +23,8 @@ from PIL import Image, ImageFilter
 # (path, height to keep, book box) — the crops carry a mirror-tiled extension
 # below the photograph which the flat fill now replaces, so it is cut here.
 CROPS = [
-    ('assets/booklet-wide.jpg',  1122, (782, 158, 1807,  958)),
-    ('assets/booklet-tight.jpg', 1332, ( 87, 368, 1112, 1168)),
+    ('assets/booklet-wide-v2.jpg',  1122, (782, 158, 1807,  958)),
+    ('assets/booklet-tight-v2.jpg', 1332, ( 87, 368, 1112, 1168)),
 ]
 
 
@@ -65,6 +65,9 @@ def flatten(im, book, target=None):
 
 # Pass a tone to re-tint the sheet — a few shades lighter, say:
 #     python3 tools/flatten-kraft.py '#CBB290'
+# Run it on the untinted crops from commit 638462e, not on the last output, and
+# bump the -vN in every asset name first: /assets/ is cached immutable for a
+# year, so an unchanged name keeps serving the old photograph (see README).
 # Both crops are scaled onto it. Paper and shadow scale together, so the shadow
 # keeps its falloff; the book is untouched. Without one, the sheet keeps its own
 # mean colour.
@@ -109,7 +112,7 @@ tile.paste(patch.transpose(Image.FLIP_LEFT_RIGHT), (w, 0))
 tile.paste(patch.transpose(Image.FLIP_TOP_BOTTOM), (0, h))
 tile.paste(patch.transpose(Image.ROTATE_180), (w, h))
 tile = tile.resize((400, 400), Image.LANCZOS)
-tile.save('assets/kraft-tile.jpg', 'JPEG', quality=92, optimize=True, subsampling=1)
+tile.save('assets/kraft-tile-v2.jpg', 'JPEG', quality=92, optimize=True, subsampling=1)
 
 # It must be drawn at the same scale as the grain inside the photograph, and
 # each crop is laid out full-bleed, so the size is a fraction of the viewport.

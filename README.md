@@ -117,11 +117,11 @@ flattened by `tools/flatten-kraft.py`. The masters live in
 `~/Desktop/Clients 🔒/Unscripted Travel/` and are not committed; pass a path as
 the first argument if they move.
 
-- `booklet-wide.jpg` — 2600×1122, desktop. Paper extended left/right so the
+- `booklet-wide-v2.jpg` — 2600×1122, desktop. Paper extended left/right so the
   sheet bleeds full width.
-- `booklet-tight.jpg` — 1199×1332, mobile (≤700px). Cropped close to the book.
+- `booklet-tight-v2.jpg` — 1199×1332, mobile (≤700px). Cropped close to the book.
 - `cover-penguin.jpg` — 1025×800, the alternate cover only.
-- `kraft-tile.jpg` — 400×400, the seamless sheet the hero stage fills with.
+- `kraft-tile-v2.jpg` — 400×400, the seamless sheet the hero stage fills with.
 
 The photograph carries the wordmark, so there is deliberately no headline typed
 over it.
@@ -143,9 +143,19 @@ falloff. The book itself is untouched. After it runs the two edges differ by
 1.6 levels (wide) and 2.5 (tight), down from thirteen.
 
 Pass a tone to re-tint the sheet. It was lifted a few shades in September 2026,
-from `#BC9C70` to `#CAB290`, with `python3 tools/flatten-kraft.py '#CBB290'`:
-paper and its shadow scale onto the new tone together, so the shadow keeps its
-falloff and the book stays exactly as shot.
+from `#BC9C70` to `#CAB290`, and again on 17 September to `#DCC9AB`, with
+`python3 tools/flatten-kraft.py '#DDC9AC'` run on the `#BC9C70` crops from
+commit `638462e`. Always re-tint from those, not from the last output, or each
+pass adds another round of JPEG loss. Paper and its shadow scale onto the new
+tone together, so the shadow keeps its falloff and the book stays exactly as
+shot. Set `--kraft` to the tone the script prints, and move `theme-color` by the
+same ratio.
+
+**Rename the three files on every re-tint** (`-v2` becomes `-v3`, in the script,
+this list and `index.html`). `vercel.json` serves `/assets/` as `immutable` for a
+year, so a browser that has seen the old file never asks for it again. Keep the
+old names and returning visitors get the old photograph next to the new fill.
+Vercel's cache ignores `?v=` query strings, so only a new path clears it.
 
 Three things follow from it, and the script prints all of them:
 

@@ -93,7 +93,7 @@ def grow(im, top=0, bottom=0, left=0, right=0):
 # ── desktop ────────────────────────────────────────────────────────────────
 pad = (WIDE_W - W) // 2
 wide = grow(src, left=pad, right=WIDE_W - W - pad)
-wide.save('assets/booklet-wide.jpg', quality=90, optimize=True, progressive=True)
+wide.save('assets/booklet-wide-v2.jpg', quality=90, optimize=True, progressive=True)
 
 # ── mobile ─────────────────────────────────────────────────────────────────
 mx = int((BOOK[2] - BOOK[0]) * MARGIN_X)
@@ -102,7 +102,7 @@ crop = (max(0, BOOK[0] - mx), max(0, BOOK[1] - my),
         min(W, BOOK[2] + mx), min(H, BOOK[3] + MARGIN_BOT))
 tight = src.crop(crop)
 tw, th = tight.size
-tight.save('assets/booklet-tight.jpg', quality=90, optimize=True, progressive=True)
+tight.save('assets/booklet-tight-v2.jpg', quality=90, optimize=True, progressive=True)
 
 # ── alternate cover ────────────────────────────────────────────────────────
 alt = Image.open(ALT).convert('RGB')
@@ -117,8 +117,8 @@ cover.save('assets/cover-penguin.jpg', quality=90, optimize=True, progressive=Tr
 
 bw, bh = BOOK[2] - BOOK[0], BOOK[3] - BOOK[1]
 paper = np.asarray(wide.convert('L')).astype(np.float64)
-print('booklet-wide.jpg ', wide.size)
-print('booklet-tight.jpg', tight.size)
+print('booklet-wide-v2.jpg ', wide.size)
+print('booklet-tight-v2.jpg', tight.size)
 print('cover-penguin.jpg', cover.size)
 print('paper level      : mean %.1f  (255 = pure white)' % paper[:80].mean())
 print()
