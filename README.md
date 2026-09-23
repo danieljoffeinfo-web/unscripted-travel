@@ -67,7 +67,7 @@ dummy prices were replaced with **On request**, not invented amounts.
 | Where | What to replace |
 |---|---|
 | `assets/` | Nothing — all seven photographs are in. |
-| Footer | `hello@unscriptedtravel.co.za`, `+27 00 000 0000`, Instagram and WhatsApp links. |
+| Footer | `hello@unscriptedtravel.co.za`, `067 366 4611`, Instagram and WhatsApp links. |
 | `FORM_ENDPOINT` in the script | Enquiry destination. **Left empty it falls back to opening a pre-filled email**, so the form works either way. |
 
 ## Swapping a photograph
